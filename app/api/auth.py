@@ -31,7 +31,6 @@ async def email_login(payload: EmailRequestSchema) -> LoginResponse:
     refresh_token = jwt_service.create_refresh_token(user_id)
     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
 
-# Refresh endpoint
 @router.post("/refresh")
 async def submit_refresh_token(refresh_token: str) -> LoginResponse:
     payload = jwt_service.decode_jwt(refresh_token)
