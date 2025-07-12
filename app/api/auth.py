@@ -5,20 +5,8 @@ from app.services import (verify_google_token, email_authorize, jwt_service, Reg
 from app.db import get_user_by_email, AsyncSessionLocal
 from app.schemas.auth_schema import LoginResponse
 
-
-
 router = APIRouter(prefix="/api", route_class=CustomRoute)
 
-# Request schema
-
-
-# JWT creator
-
-
-# Email authorization
-
-
-# Login endpoint
 @router.post("/google_login")
 async def google_login(payload: GoogleRequestSchema) -> LoginResponse:
     id_info = await verify_google_token(payload.email)
