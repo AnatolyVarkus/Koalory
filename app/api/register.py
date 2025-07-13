@@ -4,7 +4,7 @@ from app.schemas.register_schema import GoogleRequestSchema, EmailRequestSchema
 from app.schemas.auth_schema import LoginResponse
 from app.services import verify_google_token, RegisterUserService, jwt_service
 
-router = APIRouter(prefix="/api", route_class=CustomRoute)
+router = APIRouter(prefix="/register", route_class=CustomRoute)
 
 @router.post("/google_register")
 async def google_register_request(payload: GoogleRequestSchema):
