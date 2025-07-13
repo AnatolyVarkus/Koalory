@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api import auth_router, register_router
+from app.api import auth_router, register_router, form_router
 from app.core.config import settings
 from app.core.wrapper import CustomRoute
 
@@ -9,11 +9,9 @@ app = FastAPI(
     debug=settings.DEBUG
 )
 
-# Include your API routes
-app.router.route_class = CustomRoute
 app.include_router(auth_router)
 app.include_router(register_router)
-
+app.include_router(form_router)
 
 
 @app.get("/health")
