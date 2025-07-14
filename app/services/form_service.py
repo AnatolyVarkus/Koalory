@@ -6,7 +6,8 @@ from fastapi import HTTPException
 from typing import Union
 
 class FormHandlerService:
-    async def handler_create_story(self, user_id: int):
+    @staticmethod
+    async def handler_create_story(user_id: int):
         async with AsyncSessionLocal() as session:
             if await check_user(user_id, session):
                 new_story = StoriesModel(user_id=user_id)
@@ -14,6 +15,7 @@ class FormHandlerService:
                 return new_story.id
             else:
                 raise HTTPException(status_code=404, detail="User not found")
+
 
     async def handler_update_story_detail(self, job_id: int, field_name: str, value: Union[int, str]):
         if field_name in variables.ALL_FIELDS:
