@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = os.environ.get("GOOGLE_CLIENT_ID")
     DATABASE_URL: str = os.environ.get("DATABASE_URL")
     SECRET_KEY: str = os.environ.get("SECRET_KEY")
+    API_KEY: str = os.environ.get("API_KEY")
 
 class Variables(BaseModel):
     ALL_FIELDS: list = [
