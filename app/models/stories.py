@@ -17,4 +17,11 @@ class StoriesModel(Base):
     story_message: Mapped[str] = mapped_column(String(255), nullable=True)
     progress: Mapped[int] = mapped_column(default=0)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    photo_url: Mapped[str] = mapped_column(nullable=True)
+    photo_creation_ts: Mapped[int] = mapped_column(nullable=True)
+    story_url: Mapped[str] = mapped_column(nullable=True)
+    story_creation_ts: Mapped[int] = mapped_column(nullable=True)
+
+
     user = relationship("UsersModel", back_populates="stories")
