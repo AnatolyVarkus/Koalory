@@ -3,7 +3,7 @@ from app.core.wrapper import CustomRoute
 from app.schemas.s2s_schema import SuccessfulResponse
 from app.services import jwt_service, form_handler_service, verify_api_token
 
-router = APIRouter(prefix="/ai", route_class=CustomRoute)
+router = APIRouter(prefix="/ai_results", route_class=CustomRoute)
 
 @router.post("/submit_photo")
 async def submit_photo(
