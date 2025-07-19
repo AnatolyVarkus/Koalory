@@ -14,7 +14,10 @@ class RegisterUserService:
 
     async def register(self):
         async with AsyncSessionLocal() as session:
-            if await get_user_by_email(self.email, session):
+            user = await get_user_by_email(self.email, session)
+            if user:
+                if self.method == "google":
+                    return user.id
                 raise HTTPException(status_code=400, detail="User already exists")
 
             new_user = UsersModel(email=self.email, method=self.method, hashed_password=self.hashed_password)

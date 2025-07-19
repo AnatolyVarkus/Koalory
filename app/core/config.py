@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = os.environ.get("SECRET_KEY")
     API_KEY: str = os.environ.get("API_KEY")
     API_KEY_EXTERNAL: str = os.environ.get("API_KEY_EXTERNAL")
+    STRIPE_API_KEY: str = os.environ.get("STRIPE_API_KEY")
 
 class Variables(BaseModel):
     ALL_FIELDS: list = [
