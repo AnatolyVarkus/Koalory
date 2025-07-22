@@ -12,4 +12,5 @@ class StorySchema(BaseModel):
     image: str | None
 
 class StoriesResponseSchema(BaseModel):
+    max_stories: int
     stories: List[StorySchema]
