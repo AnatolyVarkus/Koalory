@@ -9,5 +9,11 @@ class StoryDetailSubmission(BaseModel):
     field_name: str
     value: Union[int, str]
 
+class FirstScreenSubmission(BaseModel):
+    job_id: int
+    name: str
+    age: int
+    location: str
+
 class SuccessfulSubmission(BaseModel):
     job_id: int
