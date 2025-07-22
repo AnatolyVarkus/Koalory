@@ -9,6 +9,7 @@ from app.models.stories import StoriesModel
 from typing import Dict, List
 from app.core import settings
 from app.core.ai_prompts import ai_prompts
+from app.services.ai_photo_generation import AIPhotoGenerator
 from app.services.google_storage_service import gcs_uploader
 from app.services.ai_photo_analysis import GPTVisionClient
 from app.db import AsyncSessionLocal
@@ -16,6 +17,7 @@ from sqlalchemy import select, and_
 from app.db import get_story_by_job_id, check_user
 from anthropic import AsyncAnthropic, HUMAN_PROMPT, AI_PROMPT
 from anthropic.types import MessageParam, ContentBlockParam, TextBlockParam
+from app.services.pdf_service import generate_pdf
 
 
 
@@ -77,9 +79,32 @@ class StoryGeneratorService:
         result["illustration_prompts"] = [p.strip() for p in prompts]
 
         return result
+
+    async def update_story(self, title, body, images, pdf_url):
+        async with AsyncSessionLocal() as session:
+            story: StoriesModel = await get_story_by_job_id(self.story.id, session)
+            story.story_title = title
+            story.story_text = body
+            story.illustration_1 = images[0]
+            story.illustration_2 = images[1]
+            story.illustration_3 = images[2]
+            story.illustration_4 = images[3]
+            story.illustration_5 = images[4]
+            story.illustration_6 = images[5]
+            story.story_url = pdf_url
+
+            await session.commit()
+
     async def run(self):
         prompt = await self.build_prompt()
         claude_response = await self.query_claude(prompt)
         print(f"{claude_response = }")
         result = self.parse_story_response(claude_response)
+        photo_generator = AIPhotoGenerator()
+        urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], "")
+
+        pdf_bytes = await generate_pdf(result["title"], result["body"], urls)
+        await gcs_uploader.upload_pdf(f"{self.user.id}|{self.story.id}", pdf_bytes)
+        await self.update_story(result["title"], result["body"], urls, f"{self.user.id}|{self.story.id}.pdf")
+        print(urls)
         return result

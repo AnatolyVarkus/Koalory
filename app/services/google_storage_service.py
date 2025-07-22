@@ -1,6 +1,7 @@
 from google.cloud import storage
 from app.core import settings
 from fastapi import HTTPException
+from io import BytesIO
 
 class GCSUploader:
     """
@@ -29,6 +30,25 @@ class GCSUploader:
         blob.upload_from_string(photo_bytes, content_type=content_type)
         blob.make_public()
 
+    def upload_pdf(self, pdf_name: str, pdf_buffer: BytesIO, content_type: str = "application/pdf") -> str:
+        """
+        Uploads a PDF file to Google Cloud Storage.
+
+        Args:
+            pdf_name (str): Desired name (without extension) for the uploaded PDF.
+            pdf_buffer (BytesIO): In-memory PDF file.
+            content_type (str): MIME type, defaults to "application/pdf".
+
+        Returns:
+            str: Public URL to the uploaded PDF.
+        """
+        blob_name = f"{pdf_name}.pdf"
+        blob = self.bucket.blob(blob_name)
+
+        blob.upload_from_file(pdf_buffer, content_type=content_type)
+        blob.make_public()
+
+        return blob.public_url
 
     def get_avatar_link(self, job_id: int):
         """

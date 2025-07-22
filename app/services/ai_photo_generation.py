@@ -137,6 +137,8 @@ class AIPhotoGenerator:
             url = await self.get_image_from_leonardo(image)
             urls.append(url)
 
+        return urls
+
     async def generate_6_illustrations(self, prompts, character_description):
 
         generated_images = []
@@ -149,6 +151,7 @@ class AIPhotoGenerator:
         while tries < 6:
             try:
                 all_urls = await self.get_6_illustrations(generated_images)
+                return all_urls
             except HTTPException as e:
                 tries += 1
                 await asyncio.sleep(5)

@@ -19,8 +19,14 @@ class StoriesModel(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     photo_url: Mapped[str] = mapped_column(nullable=True)
+    story_title: Mapped[str] = mapped_column(nullable=True)
+    story_text: Mapped[str] = mapped_column(nullable=True)
+    illustration_1: Mapped[str] = mapped_column(nullable=True)
+    illustration_2: Mapped[str] = mapped_column(nullable=True)
+    illustration_3: Mapped[str] = mapped_column(nullable=True)
+    illustration_4: Mapped[str] = mapped_column(nullable=True)
+    illustration_5: Mapped[str] = mapped_column(nullable=True)
+    illustration_6: Mapped[str] = mapped_column(nullable=True)
     story_url: Mapped[str] = mapped_column(nullable=True)
-    story_creation_ts: Mapped[int] = mapped_column(nullable=True)
-
 
     user = relationship("UsersModel", back_populates="stories")
