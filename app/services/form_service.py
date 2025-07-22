@@ -42,7 +42,7 @@ class FormHandlerService:
     async def handler_update_story_detail(self, user_id: int, job_id: int, field_name: str, value: Union[int, str]):
         if field_name in variables.ALL_FIELDS:
             async with AsyncSessionLocal() as session:
-                result = await session.execute(select(StoriesModel).where(and_(StoriesModel.id == job_id, StoriesModel.user_id == user_id)))
+                result = await session.execute(select(StoriesModel).where(and_(StoriesModel.id == job_id, StoriesModel.user_id == int(user_id))))
                 story = result.scalar_one_or_none()
                 if story:
                     self.update_field(story, field_name, value)
