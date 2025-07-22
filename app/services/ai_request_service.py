@@ -91,7 +91,6 @@ class InternalRequest:
         self.job_id = job_id
         self.photo_url = story.photo_url
         self.story_url = story.story_url
-        self.photo_creation_ts = story.photo_creation_ts
         self.story_creation_ts = story.story_creation_ts
 
     @classmethod
@@ -104,13 +103,6 @@ class InternalRequest:
                 )
             story = await get_story_by_job_id(job_id, session)
             return cls(user_id, job_id, story)
-
-    def request_photo(self):
-        progress = int(((int(time()) - self.photo_creation_ts)/variables.PHOTO_CREATION_TIME_FRAME) * 100)
-        return PreviewRequestResponse(
-            url=self.photo_url,
-            progress= progress if progress <= 100 and self.photo_url is None else 100
-        )
 
     def request_story(self):
         progress = int(((int(time()) - self.story_creation_ts)/variables.STORY_CREATION_TIME_FRAME) * 100)

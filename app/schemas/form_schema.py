@@ -17,3 +17,6 @@ class FirstScreenSubmission(BaseModel):
 
 class SuccessfulSubmission(BaseModel):
     job_id: int
+
+class PhotoLinkResponse(BaseModel):
+    photo_link: str

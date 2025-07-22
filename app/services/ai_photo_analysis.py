@@ -26,7 +26,7 @@ class GPTVisionClient:
         encoded_image = base64.b64encode(image_bytes).decode("utf-8")
 
         payload = {
-            "model": "gpt-4o",
+            "model": "gpt-4.1",
             "messages": [
                 {
                     "role": "user",
@@ -40,8 +40,7 @@ class GPTVisionClient:
                         }
                     ]
                 }
-            ],
-            "max_tokens": 500
+            ]
         }
 
         headers = {
@@ -49,7 +48,7 @@ class GPTVisionClient:
             "Content-Type": "application/json"
         }
 
-        print(f"{headers = }")
+        print(f"Prompt to analyser: {prompt}")
 
         async with aiohttp.ClientSession() as session:
             async with session.post(self.api_url, headers=headers, json=payload) as response:
@@ -59,6 +58,40 @@ class GPTVisionClient:
 
                 data = await response.json()
                 try:
+                    print(f"Return from analyser: {data['choices'][0]['message']['content']}")
                     return data["choices"][0]["message"]["content"]
                 except (KeyError, IndexError):
                     raise RuntimeError("Malformed response from GPT-4 Vision API")
+
+    async def generate_leonardo_prompt(self, prompt):
+        payload = {
+            "model": "gpt-4.1",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt}
+                    ]
+                }
+            ],
+            "max_tokens": 1000
+        }
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+
+        print(f"Prompt to leonardo prompt creator: {prompt}")
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(self.api_url, headers=headers, json=payload) as response:
+                if response.status != 200:
+                    text = await response.text()
+                    raise RuntimeError(f"GPT-4 API error: {response.status} - {text}")
+
+                data = await response.json()
+                try:
+                    return data["choices"][0]["message"]["content"]
+                except (KeyError, IndexError):
+                    raise RuntimeError("Malformed response from GPT-4 API")

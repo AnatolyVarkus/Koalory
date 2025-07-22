@@ -2,6 +2,7 @@ from app.models import StoriesModel
 from app.db import AsyncSessionLocal, db_add, check_user
 from app.core import variables
 from app.services.ai_photo_generation import AIPhotoGenerator
+from app.services.ai_story_generation import StoryGeneratorService
 from sqlalchemy import select, and_
 from fastapi import HTTPException, UploadFile
 from typing import Union
@@ -19,21 +20,21 @@ class FormHandlerService:
                 raise HTTPException(status_code=404, detail="User not found")
 
     @staticmethod
-    async def handler_update_first_screen(user_id: int, job_id: int, name: str, gender: str, age: int, location: str, photo: UploadFile):
+    async def handler_update_first_screen(user_id: int, job_id: int, name: str, gender: str, age: int, location: str, photo):
         async with AsyncSessionLocal() as session:
             result = await session.execute(select(StoriesModel).where(and_(StoriesModel.id == job_id,
                                                                            StoriesModel.user_id == user_id)))
             story = result.scalar_one_or_none()
             if story:
-                story.name = name
-                story.gender = gender
-                story.age = age
-                story.location = location
+                story.story_name = name
+                story.story_gender = gender
+                story.story_age = age
+                story.story_location = location
                 await session.commit()
+                await session.refresh(story)
                 if photo:
                     ai_photo_generator = AIPhotoGenerator()
-                    photo_bytes = await photo.read()
-                    await ai_photo_generator.run(story, photo_bytes, job_id)
+                    await ai_photo_generator.run(story, photo, job_id)
                 return story.id
             else:
                 raise HTTPException(status_code=404, detail="Story not found")
@@ -46,6 +47,8 @@ class FormHandlerService:
                 if story:
                     self.update_field(story, field_name, value)
                     await session.commit()
+                    if field_name == "message":
+                        pass
                     return story.id
                 else:
                     raise HTTPException(status_code=404, detail="Story not found")

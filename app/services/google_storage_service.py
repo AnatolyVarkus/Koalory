@@ -11,7 +11,7 @@ class GCSUploader:
         self.client = storage.Client()
         self.bucket = self.client.bucket(settings.BUCKET_NAME)
 
-    def upload_avatar(self, job_id: int, photo_bytes: bytes, content_type: str = "image/png") -> str:
+    def upload_avatar(self, photo_url: str, photo_bytes: bytes, content_type: str = "image/png"):
         """
         Upload photo to GCS under name {job_id}_avatar_image
 
@@ -23,13 +23,14 @@ class GCSUploader:
         Returns:
             str: Public URL of the uploaded image
         """
-        blob_name = f"{job_id}_avatar_image.png"
+        blob_name = f"{photo_url}.png"
         blob = self.bucket.blob(blob_name)
 
         blob.upload_from_string(photo_bytes, content_type=content_type)
         blob.make_public()
 
-    def get_avatar_bytes(self, job_id: int) -> bytes:
+
+    def get_avatar_link(self, job_id: int):
         """
         Retrieves the avatar image from GCS for the given job_id as bytes.
 
@@ -48,7 +49,6 @@ class GCSUploader:
         if not blob.exists():
             raise HTTPException(status_code=404, detail=f"No avatar image found for job_id {job_id}")
 
-        return blob.download_as_bytes()
 
 
 gcs_uploader = GCSUploader()
