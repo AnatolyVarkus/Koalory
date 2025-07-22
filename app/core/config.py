@@ -37,6 +37,11 @@ class Variables(BaseModel):
     STORY_CREATION_TIME_FRAME: int = 300  # secs
     KOALORY_PHOTO_URL: str = "https://koalory.com/photo"
     KOALORY_STORY_URL: str = "https://koalory.com/story"
+    SUBSCRIPTIONS: dict = {
+        "one": {"price": 250, "name": "First Story Package"},
+        "three": {"price": 599, "name": "Three Stories Package"},
+        "ten": {"price": 1999, "name": "Ten Stories Package"}
+    }
 
 settings = Settings()
 variables = Variables()
