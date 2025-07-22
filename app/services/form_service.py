@@ -56,8 +56,10 @@ class FormHandlerService:
                 if story:
                     self.update_field(story, field_name, value)
                     await session.commit()
-                    if field_name == "message":
-                        pass
+                    if field_name == "story_message":
+                        story_generator = await StoryGeneratorService.create(user_id, job_id)
+                        response = await story_generator.run()
+                        print(f"{response = }")
                     return story.id
                 else:
                     raise HTTPException(status_code=404, detail="Story not found")
