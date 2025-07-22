@@ -6,3 +6,10 @@ class StoryResponseSchema(BaseModel):
     title: str | None
     text: List[str] | None
     images: List[str] | None
+
+class StorySchema(BaseModel):
+    title: str | None
+    image: str | None
+
+class StoriesResponseSchema(BaseModel):
+    stories: List[StorySchema]
