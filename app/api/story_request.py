@@ -25,14 +25,17 @@ async def get_available_stories(credentials: HTTPAuthorizationCredentials = Depe
     async with AsyncSessionLocal() as session:
         user: UsersModel = await check_user(user_id, session)
         story_count = await session.scalar(select(func.count()).where(StoriesModel.user_id == int(user.id)))
+        available_stories = 0
         if user.subscription == "one":
-            return AvailableStoriesSchema(available_stories=1-story_count)
+            available_stories = 1-story_count if 1-story_count >= 0 else 0
         elif user.subscription == "three":
-            return AvailableStoriesSchema(available_stories=3-story_count)
+            available_stories = 1 - story_count if 3 - story_count >= 0 else 0
         elif user.subscription == "ten":
-            return AvailableStoriesSchema(available_stories=10-story_count)
+            available_stories = 1 - story_count if 10 - story_count >= 0 else 0
         else:
-            return AvailableStoriesSchema(available_stories=1 - story_count)
+            available_stories = 1 - story_count if 1 - story_count >= 0 else 0
+
+        return AvailableStoriesSchema(available_stories=available_stories)
 
 
 @router.get("/request_story")
