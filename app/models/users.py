@@ -10,6 +10,7 @@ class UsersModel(Base):
     subscription: Mapped[str] = mapped_column(String(255), default="free")
     method: Mapped[str] = mapped_column(String(255), nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=True)
+    description: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     stories = relationship("StoriesModel", back_populates="user")

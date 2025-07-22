@@ -14,3 +14,6 @@ class StorySchema(BaseModel):
 class StoriesResponseSchema(BaseModel):
     max_stories: int
     stories: List[StorySchema]
+
+class AvailableStoriesSchema(BaseModel):
+    available_stories: int

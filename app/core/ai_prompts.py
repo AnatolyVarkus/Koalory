@@ -26,7 +26,7 @@ class AIPrompts:
             str: Полный промпт для Leonardo AI
         """
 
-        prompt = f"""Describe this abstract AI generated character from this picture following these steps: 
+        prompt = f"""Describe this person from this picture following these steps: 
 
 Step 1: Character Name: {story.story_name} - Character Age: {story.story_age} - Character Gender: {story.story_gender} - Place of Residence: {story.story_location}
 
@@ -103,7 +103,6 @@ Instructions:
 2. Сама история (с отметками для иллюстраций в ключевых моментах)
 3. Послесловие в одном предлложении о том, какие ценности или уроки представлены в истории
 4. Промты для генерации иллюстраций - 6 детальных промтов на английском языке для генерации иллюстраций.
-5. Пиши каждый промпт с новой строки и начиная с указания иллюстрации (например ИЛЛЮСТРАЦИЯ_1:, ИЛЛЮСТРАЦИЯ_2:)
 
 Инструкции для промтов изображений:
 Промты должны:
