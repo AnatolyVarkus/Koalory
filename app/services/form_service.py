@@ -1,9 +1,9 @@
-from app.models import StoriesModel
+from app.models import StoriesModel, UsersModel
 from app.db import AsyncSessionLocal, db_add, check_user
 from app.core import variables
 from app.services.ai_photo_generation import AIPhotoGenerator
 from app.services.ai_story_generation import StoryGeneratorService
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 from fastapi import HTTPException, UploadFile
 from typing import Union
 
@@ -12,7 +12,16 @@ class FormHandlerService:
     async def handler_create_story(user_id: int):
         async with AsyncSessionLocal() as session:
             print(f"User_id: {user_id}")
-            if await check_user(user_id, session):
+            user: UsersModel = await check_user(user_id, session)
+            story_count = await session.scalar(select(func.count()).where(StoriesModel.user_id == user.id))
+            if user:
+                # if (
+                #         user.subscription == "free" and story_count >= 1 or
+                #         user.subscription == "one" and story_count >= 1 or
+                #         user.subscription == "three" and story_count >= 3 or
+                #         user.subscription == "ten" and story_count >= 10
+                # ):
+                #     raise HTTPException(status_code=400, detail=f"Limit exceeded: {story_count}")
                 new_story = StoriesModel(user_id=user_id)
                 await db_add(new_story, session)
                 return new_story.id
@@ -34,7 +43,7 @@ class FormHandlerService:
                 await session.refresh(story)
                 if photo:
                     ai_photo_generator = AIPhotoGenerator()
-                    await ai_photo_generator.run(story, photo, job_id)
+                    await ai_photo_generator.run(story, photo, job_id, user_id)
                 return story.id
             else:
                 raise HTTPException(status_code=404, detail="Story not found")

@@ -8,7 +8,8 @@ from app.models.stories import StoriesModel
 from app.core import settings
 from app.services.google_storage_service import gcs_uploader
 from app.services.ai_photo_analysis import GPTVisionClient
-from app.db import AsyncSessionLocal
+
+from app.db import AsyncSessionLocal, check_user
 from sqlalchemy import select, and_
 
 class AIPhotoGenerator:
@@ -105,12 +106,19 @@ class AIPhotoGenerator:
             story.photo_url = f"{image_generation_id}"
             await session.commit()
 
-    async def run(self, story: StoriesModel, photo_bytes: bytes, job_id: int):
+    async def update_description(self, user_id: int, photo_description: str):
+        async with AsyncSessionLocal() as session:
+            user = await check_user(user_id, session)
+            user.description = photo_description
+            await session.commit()
+
+    async def run(self, story: StoriesModel, photo_bytes: bytes, job_id: int, user_id: int):
         """
         Full pipeline: analyze photo, build prompt, generate image
         Returns image URL or raises error
         """
         photo_description = await self.analyze_photo(story, photo_bytes)
+        await self.update_description(user_id, photo_description)
         # prompt = await self.build_prompt(story, photo_description)
         image_generation_id = await self.generate_avatar(photo_description)
         await self.update_image(job_id, image_generation_id)
