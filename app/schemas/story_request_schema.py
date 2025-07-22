@@ -17,3 +17,6 @@ class StoriesResponseSchema(BaseModel):
 
 class AvailableStoriesSchema(BaseModel):
     available_stories: int
+
+class SuccessResponseSchema(BaseModel):
+    job_id: int

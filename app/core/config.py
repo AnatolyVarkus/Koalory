@@ -19,6 +19,7 @@ class Settings(BaseModel):
     API_KEY_EXTERNAL: str = os.environ.get("API_KEY_EXTERNAL")
     STRIPE_API_KEY: str = os.environ.get("STRIPE_API_KEY")
     LEONARDO_API_KEY: str = os.environ.get("LEONARDO_API_KEY")
+    ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY")
     GPT_API_KEY: str = os.environ.get("GPT_API_KEY")
 
 

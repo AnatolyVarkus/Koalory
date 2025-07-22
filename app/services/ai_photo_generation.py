@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from app.core.ai_prompts import ai_prompts
 from app.models.stories import StoriesModel
 from app.core import settings
+import asyncio
 from app.services.google_storage_service import gcs_uploader
 from app.services.ai_photo_analysis import GPTVisionClient
 
@@ -128,6 +129,32 @@ class AIPhotoGenerator:
         photo = await self.download_image(photo_link)
         # gcs_uploader.upload_avatar(image_generation_id, photo)
         return photo_link
+
+    async def get_6_illustrations(self, images):
+        urls = []
+        for image in images:
+
+            url = await self.get_image_from_leonardo(image)
+            urls.append(url)
+
+    async def generate_6_illustrations(self, prompts, character_description):
+
+        generated_images = []
+        for prompt in prompts:
+            print(f"Generating an image")
+            image = await self.generate_avatar(prompt)
+            generated_images.append(image)
+        tries = 0
+        all_urls = []
+        while tries < 6:
+            try:
+                all_urls = await self.get_6_illustrations(generated_images)
+            except HTTPException as e:
+                tries += 1
+                await asyncio.sleep(5)
+
+        return all_urls
+
 
 # Usage example (you must wire `gpt_vision_client` separately):
 # ai_generator = AIPhotoGenerator(gpt_vision_client, settings.LEONARDO_API_KEY)

@@ -115,6 +115,13 @@ Instructions:
  7. Don't use words: ukraine, war, battle, religion, looking under, shooting, pot, mushroom, under, choker, below, low angle, thorny, needle, trip, portrait etc that is restricted to use with child content
  8. This prompt is intended for generating friendly, safe, and age-appropriate children's illustrations. Avoid any references to nudity, suggestive clothing, body parts, chokers, shooting, below, low angle, or phrases like 'looking under'. Do not use camera angles or poses that can be interpreted as voyeuristic. Use soft, imaginative, and wholesome descriptions suitable for children's books or cartoons. The image must be safe for work (SFW) and child-appropriate
 
+Формат:
+1. story_title: [story_title]
+2. story: [story_body]
+3. illustration_prompts: 
+n1: [prompt]
+nN: [prompt]
+
 ## ВАЖНО
 Сначала проанализируй текст и если текст содержит запрещенные, нелегальные слова, останови генерацию и выведи сообщение об ошибке"""
 

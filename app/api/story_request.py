@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException, Q
 from fastapi.responses import Response
 from app.core.wrapper import CustomRoute
 from app.schemas.story_request_schema import (StoryResponseSchema, StoriesResponseSchema, StorySchema,
-                                              AvailableStoriesSchema)
-from app.services import jwt_service, form_handler_service, gcs_uploader
+                                              AvailableStoriesSchema, SuccessResponseSchema)
+from app.services import jwt_service, form_handler_service, gcs_uploader, StoryGeneratorService
 from app.db import AsyncSessionLocal, check_user
 from app.models import UsersModel, StoriesModel
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
 
 auth_scheme = HTTPBearer()
 
@@ -36,6 +37,18 @@ async def get_available_stories(credentials: HTTPAuthorizationCredentials = Depe
 
         return AvailableStoriesSchema(available_stories=available_stories)
 
+@router.post("/launch_story_generation")
+async def launch_story_generation(job_id: int = Query(...),
+                                  credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> SuccessResponseSchema:
+    if credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Invalid authentication scheme")
+    payload = jwt_service.decode_jwt(credentials.credentials)
+    user_id = payload.get("sub")
+
+    story_generator = await StoryGeneratorService.create(user_id, job_id)
+    response = await story_generator.run()
+
+    return SuccessResponseSchema(job_id=job_id)
 
 @router.get("/request_story")
 async def request_story(job_id: int = Query(...), credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> StoryResponseSchema:
