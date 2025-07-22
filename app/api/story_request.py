@@ -31,5 +31,5 @@ async def request_story(credentials: HTTPAuthorizationCredentials = Depends(auth
     payload = jwt_service.decode_jwt(credentials.credentials)
     user_id = payload.get("sub")
 
-    return StoriesResponseSchema(stories=[StorySchema(title="Once upon a time", image=test_link), StorySchema(title="Oh good time", image=test_link)])
+    return StoriesResponseSchema(max_stories=3, stories=[StorySchema(title="Once upon a time", image=test_link), StorySchema(title="Oh good time", image=test_link)])
 

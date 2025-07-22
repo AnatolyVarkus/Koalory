@@ -65,7 +65,6 @@ async def get_generated_photo(
         if not story:
             raise HTTPException(status_code=404, detail=f"Story with id {job_id} not found")
         if story.photo_url is None:
-
             raise HTTPException(status_code=400, detail=f"The photo has not been generated yet")
     try:
         gcs_uploader.get_avatar_link(job_id)
