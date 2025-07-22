@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.api import auth_router, register_router, form_router, payment_router, story_request_router
 import re
 import inspect
-
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.wrapper import CustomRoute
 
 app = FastAPI(
@@ -13,6 +13,14 @@ app = FastAPI(
     version="1.0.0",
     debug=settings.DEBUG,
     root_path="/api"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # разрешить ВСЕМ
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router)
