@@ -4,7 +4,9 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/Users/anatoly/Important/PycharmProjects/Koalory/app/koalory_google.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/koalory_bot/Koalory/app/koalory_google.json"
+# "/Users/anatoly/Important/PycharmProjects/Koalory/app/koalory_google.json"
+# "/home/koalory_bot/Koalory/app/koalory_google.json"
 
 class Settings(BaseModel):
     DEBUG: bool = False
