@@ -24,5 +24,7 @@ async def generate_payment_link(option: str = Form(...), credentials: HTTPAuthor
         raise HTTPException(status_code=401, detail="Invalid authentication scheme")
     payload = jwt_service.decode_jwt(credentials.credentials)
     user_id = payload.get("sub")
+
+
     payment_url = f"https://payment.example.com/checkout?user_id={user_id}&option={option}"
     return PaymentResponse(link=payment_url)

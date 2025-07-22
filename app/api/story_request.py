@@ -24,7 +24,7 @@ async def get_available_stories(credentials: HTTPAuthorizationCredentials = Depe
 
     async with AsyncSessionLocal() as session:
         user: UsersModel = await check_user(user_id, session)
-        story_count = await session.scalar(select(func.count()).where(StoriesModel.user_id == user.id))
+        story_count = await session.scalar(select(func.count()).where(StoriesModel.user_id == int(user.id)))
         if user.subscription == "one":
             return AvailableStoriesSchema(available_stories=1-story_count)
         elif user.subscription == "three":
