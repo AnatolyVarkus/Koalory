@@ -9,7 +9,7 @@ router = APIRouter(prefix="/auth", route_class=CustomRoute)
 
 @router.post("/google_login")
 async def google_login(payload: GoogleRequestSchema) -> LoginResponse:
-    id_info = await verify_google_token(payload.email)
+    id_info = await verify_google_token(payload.token)
     async with AsyncSessionLocal() as session:
         user = await get_user_by_email(id_info["email"], session)
         if not user:
