@@ -44,8 +44,8 @@ class AIPhotoGenerator:
 
         json_payload = {
             "prompt": prompt,
-            "width": 1024,
-            "height": 1024,
+            "width": 1200,
+            "height": 720,
             "modelId": settings.LEONARDO_MODEL_ID, # Replace with actual model ID
             "num_images": 1
         }
