@@ -82,15 +82,17 @@ class StoryGeneratorService:
 
         return result
 
-    async def update_story(self, title, body, images, pdf_url, unique):
+    async def update_story(self, title, body, pdf_url, unique):
         async with AsyncSessionLocal() as session:
             story: StoriesModel = await get_story_by_job_id(self.story.id, session)
             story.story_title = title
             story.story_text = body
-            print(f"{images = }")
-            story.illustration_1 = upload_image(images[0], f"photo_1_{unique}.png")
-
-            story.illustration_2 = upload_image(images[1], f"photo_2_{unique}.png")
+            story.illustration_1 = f"photo_1_{unique}.png"
+            story.illustration_2 = f"photo_2_{unique}.png"
+            story.illustration_3 = f"photo_3_{unique}.png"
+            story.illustration_4 = f"photo_4_{unique}.png"
+            story.illustration_5 = f"photo_5_{unique}.png"
+            story.illustration_6 = f"photo_6_{unique}.png"
 
             story.story_url = pdf_url
 
@@ -109,9 +111,23 @@ class StoryGeneratorService:
             photo_generator = AIPhotoGenerator()
             urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], "")
 
-            pdf_bytes = generate_pdf(result["title"], result["body"], urls)
             unique_story_uuid = str(uuid4())
+            upload_image(urls[0], f"photo_1_{unique_story_uuid}.png")
+            upload_image(urls[1], f"photo_2_{unique_story_uuid}.png")
+            upload_image(urls[2], f"photo_3_{unique_story_uuid}.png")
+            upload_image(urls[3], f"photo_4_{unique_story_uuid}.png")
+            upload_image(urls[4], f"photo_5_{unique_story_uuid}.png")
+            upload_image(urls[5], f"photo_6_{unique_story_uuid}.png")
+
+
+            pdf_bytes = generate_pdf(result["title"], result["body"], [f"photo_1_{unique_story_uuid}.png",
+                                                                       f"photo_2_{unique_story_uuid}.png",
+                                                                       f"photo_3_{unique_story_uuid}.png",
+                                                                       f"photo_4_{unique_story_uuid}.png",
+                                                                       f"photo_5_{unique_story_uuid}.png",
+                                                                       f"photo_6_{unique_story_uuid}.png"])
+
             file_name = f"story_{unique_story_uuid}.pdf"
 
             full_file_name = upload_pdf(file_name, pdf_bytes)
-            await self.update_story(result["title"], result["body"], urls, full_file_name, unique_story_uuid)
+            await self.update_story(result["title"], result["body"], full_file_name, unique_story_uuid)
