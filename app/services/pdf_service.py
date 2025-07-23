@@ -55,9 +55,6 @@ def generate_pdf(title: str, body: str, image_urls: list[str]):
         if response.ok:
             image_map[i] = BytesIO(response.content)
 
-    body = normalize_ascii(body)
-    title = normalize_ascii(title)
-
     pdf = PDFWithImages()
     pdf.add_font("DejaVu", "", "./app/DejaVuSans.ttf", uni=True)
 
