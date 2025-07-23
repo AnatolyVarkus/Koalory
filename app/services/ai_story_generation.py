@@ -69,7 +69,7 @@ class StoryGeneratorService:
             result["title"] = title_match.group(1).strip()
 
         # 2. Вырезаем тело (от "story:" до "illustration_prompts:")
-        body_match = re.search(r"story:\s*(.*?)illustration_prompts\s*:", text, re.DOTALL)
+        body_match = re.search(r"story_body:\s*(.*?)illustration_prompts\s*:", text, re.DOTALL)
         if body_match:
             result["body"] = body_match.group(1).strip()
 
