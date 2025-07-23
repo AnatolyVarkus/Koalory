@@ -12,4 +12,4 @@ class PaymentsModel(Base):
     available_stories: Mapped[int] = mapped_column()
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("UsersModel", back_populates="stories")
+    user = relationship("UsersModel", back_populates="payments")
