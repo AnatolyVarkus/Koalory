@@ -76,7 +76,7 @@ class StoryGeneratorService:
         # 3. Вырезаем иллюстрации по шаблону n1: [prompt]
         prompts = re.findall(r"n\d+:\s*(.*?)(?=\n+n\d+:|$)", text, re.DOTALL)
         result["illustration_prompts"] = [p.strip() for p in prompts]
-
+        print(f"result: {result}")
         return result
 
     async def update_story(self, title, body, pdf_url, unique):
