@@ -49,7 +49,7 @@ async def submit_stripe_payment(
                 available_stories = 3
             elif option == "ten":
                 available_stories = 10
-            new_payment = PaymentsModel(user_id = user_id, bundle_name=option, available_stories=available_stories)
+            new_payment = PaymentsModel(user_id = int(user_id), bundle_name=option, available_stories=available_stories)
             await db_add(new_payment, session)
     except Exception as e:
         print(e)
