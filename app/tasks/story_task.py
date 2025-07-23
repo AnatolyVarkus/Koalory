@@ -7,5 +7,5 @@ def run_story_generation(user_id: int, job_id: int):
     asyncio.run(_run(user_id, job_id))
 
 async def _run(user_id: int, job_id: int):
-    generator = StoryGeneratorService(user_id, job_id)
+    generator = StoryGeneratorService(job_id, user_id)
     await generator.run()
