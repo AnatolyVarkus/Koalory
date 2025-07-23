@@ -14,3 +14,4 @@ class UsersModel(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     stories = relationship("StoriesModel", back_populates="user")
+    payments = relationship("PaymentsModel", back_populates="user")
