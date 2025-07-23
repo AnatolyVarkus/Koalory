@@ -53,8 +53,16 @@ async def launch_story_generation(job_id: int = Query(...),
     payload = jwt_service.decode_jwt(credentials.credentials)
     user_id = payload.get("sub")
 
-    story_generator = await StoryGeneratorService.create(user_id, job_id)
-    await story_generator.run()
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(
+            select(StoriesModel).where(and_(StoriesModel.id == job_id, StoriesModel.user_id == int(user_id))))
+        story: StoriesModel = result.scalar_one_or_none()
+        story.story_creation_ts = int(time())
+        await session.commit()
+        await session.refresh(story)
+
+        from app.tasks.story_task import run_story_generation
+        run_story_generation.delay(user_id, job_id)
 
     return SuccessResponseSchema(job_id=job_id)
 
