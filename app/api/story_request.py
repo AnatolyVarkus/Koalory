@@ -65,7 +65,7 @@ async def launch_story_generation(job_id: int = Query(...),
             await session.refresh(story)
 
             from app.tasks.story_task import run_story_generation
-            await run_story_generation.delay(user_id, job_id)
+            run_story_generation.delay(user_id, job_id)
 
     return SuccessResponseSchema(job_id=job_id)
 
