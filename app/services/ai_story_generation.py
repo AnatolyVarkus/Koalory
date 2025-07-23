@@ -103,8 +103,6 @@ class StoryGeneratorService:
         async with CeleryAsyncSessionLocal() as session:
             story: StoriesModel = await get_story_by_job_id(self.job_id, session)
             if story.story_url is None:
-                story.story_creation_ts = int(time())
-                await session.commit()
                 prompt = await self.build_prompt()
                 claude_response = await self.query_claude(prompt)
                 print(f"{claude_response = }")
