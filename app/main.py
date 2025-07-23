@@ -7,7 +7,7 @@ import re
 import inspect
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.wrapper import CustomRoute
-# from app.core.celery_app import celery
+from app.core.celery_app import celery
 
 app = FastAPI(
     title="Koalory API",
