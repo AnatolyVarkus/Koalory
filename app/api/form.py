@@ -71,12 +71,8 @@ async def get_generated_photo(
             raise HTTPException(status_code=404, detail=f"Story with id {job_id} not found")
         if story.photo_url is None:
             raise HTTPException(status_code=400, detail=f"The photo has not been generated yet")
-    try:
-        photo_link = get_blob_link(story.photo_url)
-    except Exception as e:
-        ai_photo_generator = AIPhotoGenerator()
-        photo_link = await ai_photo_generator.run_secondary(story.photo_url, job_id)
-    return PhotoLinkResponse(photo_link = photo_link)
+
+    return PhotoLinkResponse(photo_link = story.photo_url)
 
 @router.post("/submit_story_detail")
 async def submit_story_detail(payload: StoryDetailSubmission,
