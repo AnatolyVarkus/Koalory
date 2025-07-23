@@ -12,10 +12,7 @@ class GCSUploader:
     """
 
     def __init__(self):
-        creds = service_account.Credentials.from_service_account_file(
-            "/home/koalory_bot/Koalory/app/koalory_google.json"
-        )
-        self.client = storage.Client(credentials=creds)
+        self.client = storage.Client()
         self.bucket = self.client.bucket(settings.BUCKET_NAME)
 
     def upload_avatar(self, photo_get_url: str, photo_url: str, content_type: str = "image/png"):
