@@ -86,7 +86,7 @@ Instructions:
 3. Раскрывать заданную тему (если указана)
 4. Содержать диалоги и\или яркие описания
 5. Иметь четкую структуру с началом, серединой (где герой сталкивается с вызовом) и концом (где достигается разрешение)
-6. Включать шесть специальных отметок для вставки иллюстраций в ключевых моментах рассказа: [ИЛЛЮСТРАЦИЯ 1], [ИЛЛЮСТРАЦИЯ 2], [ИЛЛЮСТРАЦИЯ 3], [ИЛЛЮСТРАЦИЯ 4], [ИЛЛЮСТРАЦИЯ 5], [ИЛЛЮСТРАЦИЯ 6]. Эти отметки должны быть размещены в тексте на отдельной строке в наиболее значимых и зрелищных моментах истории.
+6. Включать шесть специальных отметок для вставки иллюстраций в ключевых моментах рассказа: [ILLUSTRATION_1], [ILLUSTRATION_2], [ILLUSTRATION_3], [ILLUSTRATION_4], [ILLUSTRATION_5], [ILLUSTRATION_6]. Эти отметки должны быть размещены в тексте на отдельной строке в наиболее значимых и зрелищных моментах истории.
 7. Для младших возрастов используйте больше повторений, простые предложения и понятные образы и меньше диалогов. Для старших возрастов добавляйте более сложные сюжетные линии, развитие персонажей и моральные уроки.
 8. не пиши имена и внешность родственников и домашних животных (мам, пап, бабушек и тд), если они не указаны в запросе пользователя.
 ## Ограничение объема
@@ -107,7 +107,7 @@ Instructions:
  7. Don’t use words: ukraine, war, battle, religion, looking under, shooting, pot, mushroom, under, choker, below, low angle, thorny, needle, trip, portrait etc that is restricted to use with child content
  8. This prompt is intended for generating friendly, safe, and age-appropriate children’s illustrations. Avoid any references to nudity, suggestive clothing, body parts, chokers, shooting, below, low angle, or phrases like ‘looking under’. Do not use camera angles or poses that can be interpreted as voyeuristic. Use soft, imaginative, and wholesome descriptions suitable for children’s books or cartoons. The image must be safe for work (SFW) and child-appropriate
 ## ВАЖНО
-Сначала проанализируй текст и если текст содержит запрещенные, нелегальные слова, останови генерацию и выведи сообщение об ошибке"""
+Сначала проанализируй текст и если текст содержит запрещенные, нелегальные слова, останови генерацию и выведи сообщение об ошибке. Если все хорошо, сразу начинай генерацию"""
         return prompt.strip()
 
     @staticmethod
