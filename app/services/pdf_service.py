@@ -51,7 +51,7 @@ def generate_pdf(title: str, body: str, image_urls: list[bytes]):
     except:
         pass
     for i, url in enumerate(image_urls, start=1):
-        bio = BytesIO(image_urls[i - 1])
+        bio = BytesIO(url)
         bio.name = f"image_{i}.png"
         image_map[i] = bio
 
