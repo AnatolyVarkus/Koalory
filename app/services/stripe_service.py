@@ -52,12 +52,12 @@ async def submit_stripe_payment(
 
 async def count_available_stories(user_id: int):
     async with AsyncSessionLocal() as session:
-        stories = await get_all_user_stories(user_id, session)
+        stories = await get_all_user_stories(int(user_id), session)
         total_stories = len(stories)
 
         result = await session.execute(
             select(func.sum(PaymentsModel.available_stories))
-            .where(PaymentsModel.user_id == user_id)
+            .where(PaymentsModel.user_id == int(user_id))
         )
         total = result.scalar()
         return total or 0, total_stories
