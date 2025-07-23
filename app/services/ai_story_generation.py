@@ -33,7 +33,7 @@ class StoryGeneratorService:
         async with AsyncSessionLocal() as session:
             story = await get_story_by_job_id(self.job_id, session)
             user = await check_user(self.user_id, session)
-        return ai_prompts.get_story_generation_prompt(story, user.description)
+            return ai_prompts.get_story_generation_prompt(story, user.description)
 
     async def query_claude(self, prompt: str):
         try:
