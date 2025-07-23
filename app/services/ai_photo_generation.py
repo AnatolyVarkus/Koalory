@@ -9,7 +9,7 @@ from app.core import settings
 import asyncio
 from app.services.google_storage_service import upload_avatar
 from app.services.ai_photo_analysis import GPTVisionClient
-
+import asyncio
 from app.db import AsyncSessionLocal, check_user
 from sqlalchemy import select, and_
 import requests
@@ -136,7 +136,19 @@ class AIPhotoGenerator:
         await self.update_description(user_id, photo_description)
         # prompt = await self.build_prompt(story, photo_description)
         image_generation_id = await self.generate_avatar(photo_description)
-        await self.update_image(job_id, image_generation_id)
+        tries = 0
+        while tries < 6:
+            await asyncio.sleep(2)
+            try:
+                link = await self.run_secondary(image_generation_id, job_id)
+                if link:
+                    break
+            except:
+                pass
+            tries += 1
+
+
+
 
     async def run_secondary(self, image_generation_id: str, job_id: int):
         photo_link = await self.get_image_from_leonardo(image_generation_id)
