@@ -3,7 +3,7 @@ from fastapi.responses import Response
 from app.core.wrapper import CustomRoute
 from app.schemas.form_schema import (StoryDetailSubmission, SuccessfulSubmission, PhotoLinkResponse)
 from app.services import jwt_service, form_handler_service, AIPhotoGenerator
-from app.services.google_storage_service import gcs_uploader
+from app.services.google_storage_service import get_blob_link
 from app.db import AsyncSessionLocal
 from sqlalchemy import select, and_
 from fastapi.security import OAuth2PasswordBearer
@@ -72,7 +72,7 @@ async def get_generated_photo(
         if story.photo_url is None:
             raise HTTPException(status_code=400, detail=f"The photo has not been generated yet")
     try:
-        photo_link = gcs_uploader.get_avatar_link(story.photo_url)
+        photo_link = get_blob_link(story.photo_url)
     except Exception as e:
         ai_photo_generator = AIPhotoGenerator()
         photo_link = await ai_photo_generator.run_secondary(story.photo_url, job_id)
