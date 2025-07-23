@@ -28,5 +28,6 @@ class StoriesModel(Base):
     illustration_5: Mapped[str] = mapped_column(nullable=True)
     illustration_6: Mapped[str] = mapped_column(nullable=True)
     story_url: Mapped[str] = mapped_column(nullable=True)
+    story_creation_ts: Mapped[int] = mapped_column(nullable=True)
 
     user = relationship("UsersModel", back_populates="stories")

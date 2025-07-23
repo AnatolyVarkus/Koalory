@@ -6,6 +6,7 @@ from app.services.ai_story_generation import StoryGeneratorService
 from sqlalchemy import select, and_, func
 from fastapi import HTTPException, UploadFile
 from typing import Union
+from time import time
 
 class FormHandlerService:
     @staticmethod
@@ -52,14 +53,16 @@ class FormHandlerService:
         if field_name in variables.ALL_FIELDS:
             async with AsyncSessionLocal() as session:
                 result = await session.execute(select(StoriesModel).where(and_(StoriesModel.id == job_id, StoriesModel.user_id == int(user_id))))
-                story = result.scalar_one_or_none()
+                story: StoriesModel = result.scalar_one_or_none()
                 if story:
                     self.update_field(story, field_name, value)
-                    await session.commit()
                     if field_name == "story_message":
-                        story_generator = await StoryGeneratorService.create(user_id, job_id)
-                        response = await story_generator.run()
-                        print(f"{response = }")
+                        story.story_creation_ts = int(time())
+                    await session.commit()
+                    await session.refresh(story)
+                    if field_name == "story_message":
+                        from app.tasks.story_task import run_story_generation
+                        run_story_generation.delay(user_id, job_id)
                     return story.id
                 else:
                     raise HTTPException(status_code=404, detail="Story not found")

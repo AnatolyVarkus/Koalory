@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException
 from fastapi.responses import Response
 from app.core.wrapper import CustomRoute
 from app.schemas.payment_schema import (PaymentResponse, PaymentRequest)
-from app.services import jwt_service, form_handler_service, gcs_uploader
+from app.services import jwt_service, form_handler_service
 from app.db import AsyncSessionLocal
 from sqlalchemy import select, and_
 from fastapi import Header
