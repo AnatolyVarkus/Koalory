@@ -7,7 +7,7 @@ from app.core.ai_prompts import ai_prompts
 from app.models.stories import StoriesModel
 from app.core import settings
 import asyncio
-from app.services.google_storage_service import GCSUploader
+from app.services.google_storage_service import gcs_uploader, GCSUploader
 from app.services.ai_photo_analysis import GPTVisionClient
 
 from app.db import AsyncSessionLocal, check_user
@@ -141,7 +141,6 @@ class AIPhotoGenerator:
     async def run_secondary(self, image_generation_id: str, job_id: int):
         photo_link = await self.get_image_from_leonardo(image_generation_id)
         unique_address = f"avatar_{str(uuid4())}.png"
-        gcs_uploader = GCSUploader()
         full_photo_link = gcs_uploader.upload_avatar(photo_link, unique_address)
         async with AsyncSessionLocal() as session:
             result = await session.execute(select(StoriesModel).where(StoriesModel.id == job_id))

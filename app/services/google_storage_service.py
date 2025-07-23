@@ -118,10 +118,4 @@ class GCSUploader:
         if not blob.exists():
             raise HTTPException(status_code=404, detail=f"No avatar image found for job_id {job_id}")
 
-gcs_uploader = None
-
-def get_gcs_uploader():
-    global gcs_uploader
-    if gcs_uploader is None:
-        gcs_uploader = GCSUploader()
-    return gcs_uploader
+gcs_uploader = GCSUploader()
