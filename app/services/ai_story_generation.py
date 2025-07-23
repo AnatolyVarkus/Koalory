@@ -25,8 +25,9 @@ from time import time
 
 class StoryGeneratorService:
     def __init__(self, job_id: int, user_id: int):
-        self.job_id = job_id
-        self.user_id = user_id
+        self.job_id = int(job_id)
+        self.user_id = int(user_id)
+        print(f"job_id: {self.job_id}, user_id: {self.user_id}")
         self.client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     async def build_prompt(self):
