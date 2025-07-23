@@ -43,7 +43,7 @@ async def get_available_stories(credentials: HTTPAuthorizationCredentials = Depe
         else:
             available_stories = 1 - story_count if 1 - story_count >= 0 else 0
 
-        return AvailableStoriesSchema(available_stories=available_stories)
+        return AvailableStoriesSchema(available_stories=5)
 
 @router.post("/launch_story_generation")
 async def launch_story_generation(job_id: int = Query(...),
