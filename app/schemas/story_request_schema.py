@@ -13,7 +13,7 @@ class StoryResponseSchema(BaseModel):
 class StorySchema(BaseModel):
     title: str | None = None
     image: str | None = None
-    job_id: str | None = None
+    job_id: int | None = None
     theme: str | None = None
 
 class StoriesResponseSchema(BaseModel):
