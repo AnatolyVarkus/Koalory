@@ -3,8 +3,8 @@ from app.services.ai_story_generation import StoryGeneratorService
 import asyncio
 
 @shared_task
-async def run_story_generation(user_id, job_id):
-    await _run(user_id, job_id)
+def run_story_generation(user_id, job_id):
+    asyncio.run(_run(user_id, job_id))
 
 async def _run(user_id: int, job_id: int):
     generator = await StoryGeneratorService.create(user_id, job_id)
