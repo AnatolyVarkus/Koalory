@@ -1,6 +1,7 @@
 from google.cloud import storage
 from app.core import settings
 from fastapi import HTTPException
+from google.oauth2 import service_account
 from io import BytesIO
 import requests
 import os
@@ -11,9 +12,11 @@ class GCSUploader:
     """
 
     def __init__(self):
-        self.client = storage.Client()
+        creds = service_account.Credentials.from_service_account_file(
+            "/home/koalory_bot/Koalory/app/koalory_google.json"
+        )
+        self.client = storage.Client(credentials=creds)
         self.bucket = self.client.bucket(settings.BUCKET_NAME)
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/koalory_bot/Koalory/app/koalory_google.json"
 
     def upload_avatar(self, photo_get_url: str, photo_url: str, content_type: str = "image/png"):
         """
