@@ -163,6 +163,7 @@ class AIPhotoGenerator:
         return full_photo_link
 
 
+
     async def generate_6_illustrations(self, prompts, character_description):
         print(f"PROMPTS = {prompts}")
         generated_images = []
@@ -172,13 +173,19 @@ class AIPhotoGenerator:
             while tries < 6:
                 try:
                     url = await self.get_image_from_leonardo(image)
-                    generated_images.append(requests.get(url).content)
+                    generated_images.append(await fetch_image_bytes(url))
                     break
                 except Exception as e:
                     tries += 1
                     await asyncio.sleep(4 * tries)
         return generated_images
 
+async def fetch_image_bytes(url: str) -> bytes:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            if response.status != 200:
+                raise Exception(f"Failed to fetch image: {response.status}")
+            return await response.read()
 
 # Usage example (you must wire `gpt_vision_client` separately):
 # ai_generator = AIPhotoGenerator(gpt_vision_client, settings.LEONARDO_API_KEY)
