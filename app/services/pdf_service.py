@@ -51,7 +51,7 @@ def generate_pdf(title: str, body: str, image_urls: list[bytes]):
     except:
         pass
     for i, url in enumerate(image_urls, start=1):
-        image_map[i] = image_urls[i-1]
+        image_map[i] = BytesIO(image_urls[i-1])
 
     pdf = PDFWithImages()
     pdf.add_font("DejaVu", "", "./app/DejaVuSans.ttf", uni=True)
