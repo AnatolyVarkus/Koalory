@@ -3,6 +3,7 @@ from app.core import settings
 from fastapi import HTTPException
 from io import BytesIO
 import requests
+import os
 
 class GCSUploader:
     """
@@ -12,6 +13,7 @@ class GCSUploader:
     def __init__(self):
         self.client = storage.Client()
         self.bucket = self.client.bucket(settings.BUCKET_NAME)
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/koalory_bot/Koalory/app/koalory_google.json"
 
     def upload_avatar(self, photo_get_url: str, photo_url: str, content_type: str = "image/png"):
         """
