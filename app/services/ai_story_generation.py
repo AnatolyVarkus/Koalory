@@ -9,6 +9,7 @@ from app.models.stories import StoriesModel
 from typing import Dict, List
 from app.core import settings
 from app.core.ai_prompts import ai_prompts
+from app.services.stripe_service import count_available_stories
 from app.services.ai_photo_generation import AIPhotoGenerator
 from app.services.google_storage_service import upload_pdf, upload_image
 from app.services.ai_photo_analysis import GPTVisionClient
@@ -100,9 +101,12 @@ class StoryGeneratorService:
 
     async def run(self):
         CeleryAsyncSessionLocal = get_async_sessionmaker()
+
         async with CeleryAsyncSessionLocal() as session:
             story: StoriesModel = await get_story_by_job_id(self.job_id, session)
-            if story.story_url is None:
+            total_stories, total_available_stories = await count_available_stories(self.user_id)
+
+            if story.story_url is None and total_available_stories >= total_stories:
                 prompt = await self.build_prompt()
                 claude_response = await self.query_claude(prompt)
                 print(f"{claude_response = }")
