@@ -87,12 +87,12 @@ class StoryGeneratorService:
             story: StoriesModel = await get_story_by_job_id(self.story.id, session)
             story.story_title = title
             story.story_text = body
-            story.illustration_1 = f"photo_1_{unique}.png"
-            story.illustration_2 = f"photo_2_{unique}.png"
-            story.illustration_3 = f"photo_3_{unique}.png"
-            story.illustration_4 = f"photo_4_{unique}.png"
-            story.illustration_5 = f"photo_5_{unique}.png"
-            story.illustration_6 = f"photo_6_{unique}.png"
+            story.illustration_1 = f"https://storage.googleapis.com/koalory_bucket/photo_1_{unique}.png"
+            story.illustration_2 = f"https://storage.googleapis.com/koalory_bucket/photo_2_{unique}.png"
+            story.illustration_3 = f"https://storage.googleapis.com/koalory_bucket/photo_3_{unique}.png"
+            story.illustration_4 = f"https://storage.googleapis.com/koalory_bucket/photo_4_{unique}.png"
+            story.illustration_5 = f"https://storage.googleapis.com/koalory_bucket/photo_5_{unique}.png"
+            story.illustration_6 = f"https://storage.googleapis.com/koalory_bucket/photo_6_{unique}.png"
 
             story.story_url = pdf_url
 
@@ -120,12 +120,7 @@ class StoryGeneratorService:
             upload_image(urls[5], f"photo_6_{unique_story_uuid}.png")
 
 
-            pdf_bytes = generate_pdf(result["title"], result["body"], [f"https://storage.googleapis.com/koalory_bucket/photo_1_{unique_story_uuid}.png",
-                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_2_{unique_story_uuid}.png",
-                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_3_{unique_story_uuid}.png",
-                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_4_{unique_story_uuid}.png",
-                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_5_{unique_story_uuid}.png",
-                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_6_{unique_story_uuid}.png"])
+            pdf_bytes = generate_pdf(result["title"], result["body"], urls)
 
             file_name = f"story_{unique_story_uuid}.pdf"
 
