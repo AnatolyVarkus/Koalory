@@ -120,12 +120,12 @@ class StoryGeneratorService:
             upload_image(urls[5], f"photo_6_{unique_story_uuid}.png")
 
 
-            pdf_bytes = generate_pdf(result["title"], result["body"], [f"photo_1_{unique_story_uuid}.png",
-                                                                       f"photo_2_{unique_story_uuid}.png",
-                                                                       f"photo_3_{unique_story_uuid}.png",
-                                                                       f"photo_4_{unique_story_uuid}.png",
-                                                                       f"photo_5_{unique_story_uuid}.png",
-                                                                       f"photo_6_{unique_story_uuid}.png"])
+            pdf_bytes = generate_pdf(result["title"], result["body"], [f"https://storage.googleapis.com/koalory_bucket/photo_1_{unique_story_uuid}.png",
+                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_2_{unique_story_uuid}.png",
+                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_3_{unique_story_uuid}.png",
+                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_4_{unique_story_uuid}.png",
+                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_5_{unique_story_uuid}.png",
+                                                                       f"https://storage.googleapis.com/koalory_bucket/photo_6_{unique_story_uuid}.png"])
 
             file_name = f"story_{unique_story_uuid}.pdf"
 
