@@ -112,7 +112,7 @@ def determine_progress(story: StoriesModel) -> str:
         return "finished"
 
 @router.get("/all_stories")
-async def request_story(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> StoriesResponseSchema:
+async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> StoriesResponseSchema:
     if credentials.scheme.lower() != "bearer":
         raise HTTPException(status_code=401, detail="Invalid authentication scheme")
     payload = jwt_service.decode_jwt(credentials.credentials)
