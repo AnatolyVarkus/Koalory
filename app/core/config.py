@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-#
+c
 
-import os
-print("GOOGLE_APPLICATION_CREDENTIALS =", os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+# import os
+# print("GOOGLE_APPLICATION_CREDENTIALS =", os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 # "/Users/anatoly/Important/PycharmProjects/Koalory/app/koalory_google.json"
 # "/home/koalory_bot/Koalory/app/koalory_google.json"
 
