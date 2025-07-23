@@ -6,6 +6,7 @@ import re
 from app.core.ai_prompts import ai_prompts
 from app.models import UsersModel
 from app.models.stories import StoriesModel
+from app.models import PaymentsModel
 from typing import Dict, List
 from app.core import settings
 from app.core.ai_prompts import ai_prompts
@@ -14,8 +15,8 @@ from app.services.ai_photo_generation import AIPhotoGenerator
 from app.services.google_storage_service import upload_pdf, upload_image
 from app.services.ai_photo_analysis import GPTVisionClient
 from app.db import AsyncSessionLocal
-from sqlalchemy import select, and_
-from app.db import get_story_by_job_id, check_user
+from sqlalchemy import select, and_, func
+from app.db import get_story_by_job_id, check_user, get_all_user_stories
 from anthropic import AsyncAnthropic, HUMAN_PROMPT, AI_PROMPT
 from anthropic.types import MessageParam, ContentBlockParam, TextBlockParam
 from app.services.pdf_service import generate_pdf
@@ -104,7 +105,14 @@ class StoryGeneratorService:
 
         async with CeleryAsyncSessionLocal() as session:
             story: StoriesModel = await get_story_by_job_id(self.job_id, session)
-            total_stories, total_available_stories = await count_available_stories(self.user_id)
+            stories = await get_all_user_stories(int(self.user_id), session)
+            total_stories = len(stories)
+
+            result = await session.execute(
+                select(func.sum(PaymentsModel.available_stories))
+                .where(PaymentsModel.user_id == int(self.user_id))
+            )
+            total_available_stories = result.scalar()
 
             if story.story_url is None and total_available_stories >= total_stories:
                 prompt = await self.build_prompt()
