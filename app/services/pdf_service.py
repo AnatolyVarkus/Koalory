@@ -43,7 +43,7 @@ def normalize_ascii(text: str) -> str:
     )
 
 
-def generate_pdf(title: str, body: str, image_urls: list[BytesIO]):
+def generate_pdf(title: str, body: str, image_urls: list[bytes]):
     image_map = {}
     try:
         title = normalize_ascii(title)
