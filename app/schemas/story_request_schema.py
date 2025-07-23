@@ -15,6 +15,7 @@ class StorySchema(BaseModel):
     image: str | None = None
     job_id: int | None = None
     theme: str | None = None
+    progress: str | None = None
 
 class StoriesResponseSchema(BaseModel):
     max_stories: int

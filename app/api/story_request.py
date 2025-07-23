@@ -86,7 +86,19 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
 
 
 
-
+def determine_progress(story: StoriesModel) -> str:
+    if story.story_creation_ts:
+        return "finished"
+    elif story.story_name is None or story.photo_url is None:
+        return "first_screen"
+    elif story.photo_url and story.story_extra is None:
+        return "generated_photo"
+    elif story.story_extra and story.story_theme is None:
+        return "story_theme"
+    elif story.story_theme and story.story_message is None:
+        return "story_message"
+    else:
+        return "finished"
 
 @router.get("/all_stories")
 async def request_story(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> StoriesResponseSchema:
@@ -100,7 +112,8 @@ async def request_story(credentials: HTTPAuthorizationCredentials = Depends(auth
         user = await check_user(user_id, session)
     all_stories = []
     for story in stories:
-        all_stories.append(StorySchema(title=story.story_title, image=story.photo_url, job_id=story.id, theme=story.story_theme))
+        all_stories.append(StorySchema(title=story.story_title, image=story.photo_url, job_id=story.id, theme=story.story_theme,
+                                       progress=determine_progress(story)))
 
     if user.subscription == "one":
         max_stories = 1
