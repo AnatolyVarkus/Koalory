@@ -3,7 +3,7 @@ from fastapi.responses import Response
 from app.core.wrapper import CustomRoute
 from app.schemas.story_request_schema import (StoryResponseSchema, StoriesResponseSchema, StorySchema,
                                               AvailableStoriesSchema, SuccessResponseSchema)
-from app.services import jwt_service, form_handler_service, StoryGeneratorService
+from app.services import jwt_service, form_handler_service, StoryGeneratorService, count_available_stories
 from app.db import AsyncSessionLocal, check_user, get_all_user_stories
 from app.models import UsersModel, StoriesModel
 from app.core import variables
@@ -31,19 +31,31 @@ async def get_available_stories(credentials: HTTPAuthorizationCredentials = Depe
     payload = jwt_service.decode_jwt(credentials.credentials)
     user_id = payload.get("sub")
 
-    async with AsyncSessionLocal() as session:
-        user: UsersModel = await check_user(user_id, session)
-        story_count = await session.scalar(select(func.count()).where(StoriesModel.user_id == int(user.id)))
-        if user.subscription == "one":
-            available_stories = 1-story_count if 1-story_count >= 0 else 0
-        elif user.subscription == "three":
-            available_stories = 1 - story_count if 3 - story_count >= 0 else 0
-        elif user.subscription == "ten":
-            available_stories = 1 - story_count if 10 - story_count >= 0 else 0
-        else:
-            available_stories = 1 - story_count if 1 - story_count >= 0 else 0
+    available_stories, total_stories = await count_available_stories(user_id)
+    if total_stories == 0:
+        return AvailableStoriesSchema(available_stories=max(1, available_stories))
+    elif total_stories == 1 and available_stories == 0:
+        return AvailableStoriesSchema(available_stories=0)
+    else:
+        final_available_stories = (available_stories - total_stories) if (available_stories - total_stories) >= 0 else 0
+        return AvailableStoriesSchema(available_stories=final_available_stories)
 
-        return AvailableStoriesSchema(available_stories=5)
+@router.get("/can_continue_story")
+async def can_continue_story(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> AvailableStoriesSchema:
+    if credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Invalid authentication scheme")
+    payload = jwt_service.decode_jwt(credentials.credentials)
+    user_id = payload.get("sub")
+
+    available_stories, total_stories = await count_available_stories(user_id)
+    if total_stories == 0:
+        return AvailableStoriesSchema(available_stories=max(1, available_stories))
+    elif total_stories == 1 and available_stories == 0:
+        return AvailableStoriesSchema(available_stories=0)
+    else:
+        final_available_stories = (available_stories - total_stories) if (available_stories - total_stories) >= 0 else 0
+        return AvailableStoriesSchema(available_stories=final_available_stories + 1)
+
 
 @router.post("/launch_story_generation")
 async def launch_story_generation(job_id: int = Query(...),
