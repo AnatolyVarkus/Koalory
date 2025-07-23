@@ -10,7 +10,7 @@ from typing import Dict, List
 from app.core import settings
 from app.core.ai_prompts import ai_prompts
 from app.services.ai_photo_generation import AIPhotoGenerator
-from app.services.google_storage_service import GCSUploader
+from app.services.google_storage_service import GCSUploader, gcs_uploader
 from app.services.ai_photo_analysis import GPTVisionClient
 from app.db import AsyncSessionLocal
 from sqlalchemy import select, and_
@@ -88,7 +88,6 @@ class StoryGeneratorService:
             story.story_title = title
             story.story_text = body
             print(f"{images = }")
-            gcs_uploader = GCSUploader()
             story.illustration_1 = gcs_uploader.upload_image(images[0], f"photo_1_{unique}.png")
 
             story.illustration_2 = gcs_uploader.upload_image(images[1], f"photo_2_{unique}.png")
@@ -108,7 +107,6 @@ class StoryGeneratorService:
             print(f"{claude_response = }")
             result = self.parse_story_response(claude_response)
             photo_generator = AIPhotoGenerator()
-            gcs_uploader = GCSUploader()
             urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], "")
 
             pdf_bytes = generate_pdf(result["title"], result["body"], urls)
