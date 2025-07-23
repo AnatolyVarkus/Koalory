@@ -62,7 +62,7 @@ class FormHandlerService:
                     await session.refresh(story)
                     if field_name == "story_message":
                         from app.tasks.story_task import run_story_generation
-                        run_story_generation.delay(user_id, job_id)
+                        await run_story_generation.delay(user_id, job_id)
                     return story.id
                 else:
                     raise HTTPException(status_code=404, detail="Story not found")
