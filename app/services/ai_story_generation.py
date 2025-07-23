@@ -20,6 +20,7 @@ from anthropic.types import MessageParam, ContentBlockParam, TextBlockParam
 from app.services.pdf_service import generate_pdf
 from uuid import uuid4
 from time import time
+from app.db.db_celery import CeleryAsyncSessionLocal
 
 
 
@@ -31,7 +32,7 @@ class StoryGeneratorService:
         self.client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     async def build_prompt(self):
-        async with AsyncSessionLocal() as session:
+        async with CeleryAsyncSessionLocal() as session:
             story = await get_story_by_job_id(self.job_id, session)
             user = await check_user(self.user_id, session)
             return ai_prompts.get_story_generation_prompt(story, user.description)
@@ -80,7 +81,7 @@ class StoryGeneratorService:
         return result
 
     async def update_story(self, title, body, pdf_url, unique):
-        async with AsyncSessionLocal() as session:
+        async with CeleryAsyncSessionLocal() as session:
             story: StoriesModel = await get_story_by_job_id(self.job_id, session)
             story.story_title = title
             story.story_text = body
@@ -96,10 +97,10 @@ class StoryGeneratorService:
             await session.commit()
 
     async def run(self):
-        async with AsyncSessionLocal() as session:
+        async with CeleryAsyncSessionLocal() as session:
             story: StoriesModel = await get_story_by_job_id(self.job_id, session)
             if story.story_url is None:
-                async with AsyncSessionLocal() as session:
+                async with CeleryAsyncSessionLocal() as session:
                     story: StoriesModel = await get_story_by_job_id(self.job_id, session)
                     story.story_creation_ts = int(time())
                     await session.commit()
