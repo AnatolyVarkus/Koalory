@@ -24,20 +24,16 @@ from time import time
 
 
 class StoryGeneratorService:
-    def __init__(self, story: StoriesModel, user: UsersModel):
-        self.story = story
-        self.user = user
-        self.client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)  # assuming it's in your settings
-
-    @classmethod
-    async def create(cls, user_id: int, job_id: int):
-        async with AsyncSessionLocal() as session:
-            story = await get_story_by_job_id(job_id, session)
-            user = await check_user(user_id, session)
-            return cls(story, user)
+    def __init__(self, job_id: int, user_id: int):
+        self.job_id = job_id
+        self.user_id = user_id
+        self.client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     async def build_prompt(self):
-        return ai_prompts.get_story_generation_prompt(self.story, self.user.description)
+        async with AsyncSessionLocal() as session:
+            story = await get_story_by_job_id(self.job_id, session)
+            user = await check_user(self.user_id, session)
+        return ai_prompts.get_story_generation_prompt(story, user.description)
 
     async def query_claude(self, prompt: str):
         try:
@@ -84,7 +80,7 @@ class StoryGeneratorService:
 
     async def update_story(self, title, body, pdf_url, unique):
         async with AsyncSessionLocal() as session:
-            story: StoriesModel = await get_story_by_job_id(self.story.id, session)
+            story: StoriesModel = await get_story_by_job_id(self.job_id, session)
             story.story_title = title
             story.story_text = body
             story.illustration_1 = f"https://storage.googleapis.com/koalory_bucket/photo_1_{unique}.png"
@@ -99,30 +95,32 @@ class StoryGeneratorService:
             await session.commit()
 
     async def run(self):
-        if self.story.story_url is None:
-            async with AsyncSessionLocal() as session:
-                story: StoriesModel = await get_story_by_job_id(self.story.id, session)
-                story.story_creation_ts = int(time())
-                await session.commit()
-            prompt = await self.build_prompt()
-            claude_response = await self.query_claude(prompt)
-            print(f"{claude_response = }")
-            result = self.parse_story_response(claude_response)
-            photo_generator = AIPhotoGenerator()
-            urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], "")
+        async with AsyncSessionLocal() as session:
+            story: StoriesModel = await get_story_by_job_id(self.job_id, session)
+            if story.story_url is None:
+                async with AsyncSessionLocal() as session:
+                    story: StoriesModel = await get_story_by_job_id(self.job_id, session)
+                    story.story_creation_ts = int(time())
+                    await session.commit()
+                prompt = await self.build_prompt()
+                claude_response = await self.query_claude(prompt)
+                print(f"{claude_response = }")
+                result = self.parse_story_response(claude_response)
+                photo_generator = AIPhotoGenerator()
+                urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], "")
 
-            unique_story_uuid = str(uuid4())
-            upload_image(urls[0], f"photo_1_{unique_story_uuid}.png")
-            upload_image(urls[1], f"photo_2_{unique_story_uuid}.png")
-            upload_image(urls[2], f"photo_3_{unique_story_uuid}.png")
-            upload_image(urls[3], f"photo_4_{unique_story_uuid}.png")
-            upload_image(urls[4], f"photo_5_{unique_story_uuid}.png")
-            upload_image(urls[5], f"photo_6_{unique_story_uuid}.png")
+                unique_story_uuid = str(uuid4())
+                upload_image(urls[0], f"photo_1_{unique_story_uuid}.png")
+                upload_image(urls[1], f"photo_2_{unique_story_uuid}.png")
+                upload_image(urls[2], f"photo_3_{unique_story_uuid}.png")
+                upload_image(urls[3], f"photo_4_{unique_story_uuid}.png")
+                upload_image(urls[4], f"photo_5_{unique_story_uuid}.png")
+                upload_image(urls[5], f"photo_6_{unique_story_uuid}.png")
 
 
-            pdf_bytes = generate_pdf(result["title"], result["body"], urls)
+                pdf_bytes = generate_pdf(result["title"], result["body"], urls)
 
-            file_name = f"story_{unique_story_uuid}.pdf"
+                file_name = f"story_{unique_story_uuid}.pdf"
 
-            full_file_name = upload_pdf(file_name, pdf_bytes)
-            await self.update_story(result["title"], result["body"], full_file_name, unique_story_uuid)
+                full_file_name = upload_pdf(file_name, pdf_bytes)
+                await self.update_story(result["title"], result["body"], full_file_name, unique_story_uuid)
