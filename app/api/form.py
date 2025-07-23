@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException
 from fastapi.responses import Response
 from app.core.wrapper import CustomRoute
 from app.schemas.form_schema import (StoryDetailSubmission, SuccessfulSubmission, PhotoLinkResponse)
-from app.services import jwt_service, form_handler_service, gcs_uploader, AIPhotoGenerator
+from app.services import jwt_service, form_handler_service, AIPhotoGenerator
+from app.services.google_storage_service import GCSUploader
 from app.db import AsyncSessionLocal
 from sqlalchemy import select, and_
 from fastapi.security import OAuth2PasswordBearer
@@ -14,6 +15,10 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 auth_scheme = HTTPBearer()
 
 router = APIRouter(prefix="/form", route_class=CustomRoute)
+
+import re
+
+
 
 @router.post("/create_story")
 async def create_story(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> SuccessfulSubmission:
@@ -67,11 +72,11 @@ async def get_generated_photo(
         if story.photo_url is None:
             raise HTTPException(status_code=400, detail=f"The photo has not been generated yet")
     try:
-        gcs_uploader.get_avatar_link(job_id)
-        photo_link = f"https://storage.googleapis.com/koalory_bucket/{story.photo_url}.png"
+        gcs_uploader = GCSUploader()
+        photo_link = gcs_uploader.get_avatar_link(story.photo_url)
     except Exception as e:
         ai_photo_generator = AIPhotoGenerator()
-        photo_link = await ai_photo_generator.run_secondary(story.photo_url)
+        photo_link = await ai_photo_generator.run_secondary(story.photo_url, job_id)
     return PhotoLinkResponse(photo_link = photo_link)
 
 @router.post("/submit_story_detail")

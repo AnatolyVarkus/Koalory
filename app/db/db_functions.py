@@ -43,3 +43,10 @@ async def check_story_ownership(
     result = await db.execute(stmt)
     story = result.scalar_one_or_none()
     return story is not None
+
+async def get_all_user_stories(user_id: int, session: AsyncSessionLocal):
+    from app.models import StoriesModel
+    stmt = select(StoriesModel).where(StoriesModel.user_id == int(user_id))
+    result = await session.execute(stmt)
+    stories = result.scalars().all()
+    return stories

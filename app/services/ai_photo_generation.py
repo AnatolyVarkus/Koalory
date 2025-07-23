@@ -7,11 +7,13 @@ from app.core.ai_prompts import ai_prompts
 from app.models.stories import StoriesModel
 from app.core import settings
 import asyncio
-from app.services.google_storage_service import gcs_uploader
+from app.services.google_storage_service import GCSUploader
 from app.services.ai_photo_analysis import GPTVisionClient
 
 from app.db import AsyncSessionLocal, check_user
 from sqlalchemy import select, and_
+import requests
+from uuid import uuid4
 
 class AIPhotoGenerator:
     """
@@ -69,12 +71,10 @@ class AIPhotoGenerator:
 
     async def get_image_from_leonardo(self, image_generation_id: str) -> str:
         url = f"https://cloud.leonardo.ai/api/rest/v1/generations/{image_generation_id}"
-
         headers = {
             "Authorization": f"Bearer {self.leonardo_api_key}",
             "Content-Type": "application/json"
         }
-
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
@@ -83,11 +83,24 @@ class AIPhotoGenerator:
                     raise HTTPException(status_code=400, detail=f"Leonardo API error: {response.status} - {body}")
 
                 data = await response.json()
+
                 try:
-                    print(data)
-                    return data['generations_by_pk']['generated_images'][0]["url"]  # Adjust according to Leonardo’s response format
+                    img_url = data['generations_by_pk']['generated_images'][0]["url"]
                 except (KeyError, IndexError):
                     raise HTTPException(status_code=400, detail="Leonardo response malformed")
+
+        # Now test the URL with retries
+        for attempt in range(5):
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(img_url, timeout=10) as img_response:
+                        if img_response.status == 200:
+                            return img_url
+            except Exception as e:
+                print(f"[Leonardo CDN Retry] Attempt {attempt + 1} failed: {e}")
+                await asyncio.sleep(2 * (attempt + 1))
+
+        raise HTTPException(status_code=500, detail="Leonardo CDN returned invalid image repeatedly.")
 
     async def download_image(self, url: str) -> bytes:
         """Download image from a URL and return its bytes"""
@@ -113,6 +126,7 @@ class AIPhotoGenerator:
             user.description = photo_description
             await session.commit()
 
+
     async def run(self, story: StoriesModel, photo_bytes: bytes, job_id: int, user_id: int):
         """
         Full pipeline: analyze photo, build prompt, generate image
@@ -124,39 +138,35 @@ class AIPhotoGenerator:
         image_generation_id = await self.generate_avatar(photo_description)
         await self.update_image(job_id, image_generation_id)
 
-    async def run_secondary(self, image_generation_id: str):
+    async def run_secondary(self, image_generation_id: str, job_id: int):
         photo_link = await self.get_image_from_leonardo(image_generation_id)
-        photo = await self.download_image(photo_link)
-        # gcs_uploader.upload_avatar(image_generation_id, photo)
-        return photo_link
+        unique_address = f"avatar_{str(uuid4())}.png"
+        gcs_uploader = GCSUploader()
+        full_photo_link = gcs_uploader.upload_avatar(photo_link, unique_address)
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(select(StoriesModel).where(StoriesModel.id == job_id))
+            story = result.scalar_one_or_none()
 
-    async def get_6_illustrations(self, images):
-        urls = []
-        for image in images:
+            story.photo_url = full_photo_link
+            await session.commit()
+        return full_photo_link
 
-            url = await self.get_image_from_leonardo(image)
-            urls.append(url)
-
-        return urls
 
     async def generate_6_illustrations(self, prompts, character_description):
-
+        print(f"PROMPTS = {prompts}")
         generated_images = []
         for prompt in prompts:
-            print(f"Generating an image")
             image = await self.generate_avatar(prompt)
-            generated_images.append(image)
-        tries = 0
-        all_urls = []
-        while tries < 6:
-            try:
-                all_urls = await self.get_6_illustrations(generated_images)
-                return all_urls
-            except HTTPException as e:
-                tries += 1
-                await asyncio.sleep(5)
-
-        return all_urls
+            tries = 0
+            while tries < 6:
+                try:
+                    url = await self.get_image_from_leonardo(image)
+                    generated_images.append(requests.get(url).content)
+                    break
+                except Exception as e:
+                    tries += 1
+                    await asyncio.sleep(4 * tries)
+        return generated_images
 
 
 # Usage example (you must wire `gpt_vision_client` separately):

@@ -3,13 +3,18 @@ from typing import List
 
 class StoryResponseSchema(BaseModel):
     progress: int
-    title: str | None
-    text: List[str] | None
-    images: List[str] | None
+    title: str | None = None
+    text: List[str] | None = None
+    images: List[str] | None = None
+    pdf_url: str | None = None
+    email: str | None = None
+    word_count: int | None = None
 
 class StorySchema(BaseModel):
-    title: str | None
-    image: str | None
+    title: str | None = None
+    image: str | None = None
+    job_id: str | None = None
+    theme: str | None = None
 
 class StoriesResponseSchema(BaseModel):
     max_stories: int

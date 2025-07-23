@@ -45,8 +45,11 @@ def normalize_ascii(text: str) -> str:
 
 def generate_pdf(title: str, body: str, image_urls: list[str]):
     image_map = {}
-    title = normalize_ascii(title)
-    body = normalize_ascii(body)
+    try:
+        title = normalize_ascii(title)
+        body = normalize_ascii(body)
+    except:
+        pass
     for i, url in enumerate(image_urls, start=1):
         response = requests.get(url)
         if response.ok:
@@ -56,12 +59,13 @@ def generate_pdf(title: str, body: str, image_urls: list[str]):
     title = normalize_ascii(title)
 
     pdf = PDFWithImages()
+    pdf.add_font("DejaVu", "", "./app/DejaVuSans.ttf", uni=True)
 
     # Set fonts
-    pdf.set_font("Helvetica", size=16)
+    pdf.set_font("DejaVu", size=16)
     pdf.multi_cell(0, 10, title, align="C")
     pdf.ln(10)
-    pdf.set_font("Helvetica", size=12)
+    pdf.set_font("DejaVu", size=12)
 
     # Inject text and images
     pdf.add_wrapped_text(body, image_map)
