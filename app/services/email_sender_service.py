@@ -56,35 +56,57 @@ def send_reset_email(to_email: str, token: str):
     return resend.Emails.send(params)
 
 
-def send_pdf_email(to_email: str, url: str):
-    """
-    Sends an email with a link to the generated story PDF.
-    """
-    print(f"[DEBUG] Story URL: {url}")
-    file_path = Path(__file__).parent.parent / "your_story_is_ready.png"
-
-    with open(file_path, "rb") as f:
-        attachment_content = base64.b64encode(f.read()).decode()
-
+def send_pdf_email(to_email: str, story_url: str):
     image_url = "https://storage.googleapis.com/koalory_bucket/your_story_is_ready.png"
 
     params = resend.Emails.SendParams(**{
         "from": "Koalory <noreply@koalory.com>",
         "to": [to_email],
-        "subject": "Your Story is Ready!",
+        "subject": "✨ Your personal story is ready! + special offer inside",
         "html": f"""
-            <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
-                <img src="{image_url}" alt="Koalory Banner"
-                     style="width: 100%; max-width: 600px; height: auto; display: block; margin-bottom: 20px;" />
-                <p>Your story is ready!</p>
-                <p>
-                    <a href="{url}" style="color: #1a73e8; text-decoration: none; font-weight: bold;">
-                        Click here to view your story
-                    </a>
-                </p>
-                <p style="margin-top: 20px;">Enjoy the adventure!</p>
-            </div>
-            """.strip()
+        <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6; max-width: 600px; margin: auto;">
+            <img src="{image_url}" alt="Koalory Banner"
+                style="width: 100%; max-width: 600px; height: auto; display: block; margin-bottom: 20px;" />
+
+            <p>Hi there!</p>
+
+            <p>Your personal story is ready! 🎉</p>
+
+            <p style="margin: 20px 0;">
+                <a href="{story_url}" style="display: inline-block; background-color: #1a73e8; color: #fff;
+                padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                    👆 READ YOUR STORY
+                </a>
+            </p>
+
+            <p>How do you like it? We put all the AI magic into creating <strong>YOUR</strong> unique story with your interests, hobbies, and personality.</p>
+
+            <p style="font-weight: bold;">⏰ NEXT 10 MINUTES ONLY!</p>
+
+            <p>While you're reading your first story, you have a unique opportunity:</p>
+
+            <p>🎁 <strong>3 PERSONAL STORIES for just $5.99</strong> (instead of $8.97)</p>
+            <p>Save $2.98 = almost a whole story for free!</p>
+
+            <ul style="padding-left: 20px;">
+                <li>✅ 3 unique stories about any characters</li>
+                <li>✅ Any genres and moods</li>
+                <li>✅ High-quality illustrations</li>
+                <li>✅ Email delivery in 5 minutes</li>
+            </ul>
+
+            <p style="margin: 20px 0;">
+                <a href="https://story.koalory.com/pricing" style="display: inline-block; background-color: #34a853; color: #fff;
+                padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                    👉 GET 3 STORIES FOR $5.99
+                </a>
+            </p>
+
+            <p style="margin-top: 30px;">Offer valid for 10 minutes only after receiving this email</p>
+
+            <p>With love,<br>Koalory Team ✨</p>
+        </div>
+        """.strip()
     })
 
     return resend.Emails.send(params)
