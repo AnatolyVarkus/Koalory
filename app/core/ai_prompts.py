@@ -65,7 +65,7 @@ Instructions:
         Returns:
             str: Полный промпт для Claude API
         """
-        input_language = "english"
+        story.story_language = "english"
         prompt = f"""Используйте следующую информацию о персонаже: {hero_description}
 ## Жанр истории:
 {story.story_theme}
@@ -91,7 +91,7 @@ Instructions:
 8. не пиши имена и внешность родственников и домашних животных (мам, пап, бабушек и тд), если они не указаны в запросе пользователя.
 ## Ограничение объема
 Каждая ключевая часть рассказа (выделенная под изображение) должна содержать не более 3500 символов, не учитывая промты для генерации изображений.
-## Структура ответа (the tags themselves should be strictly in English: story_title, story_body, illustration_prompts, n1, n2, n3, n4, n5, n6)
+## Структура ответа (these should be in English everything else in {story.story_language}: story_title, story_body, illustration_prompts, n1, n2, n3, n4, n5, n6)
 1. Название истории (яркое и соответствующее сюжету) (story_title)
 2. Сама история (с отметками для иллюстраций в ключевых моментах) (story_body)
 3. Послесловие в одном предлложении о том, какие ценности или уроки представлены в истории
