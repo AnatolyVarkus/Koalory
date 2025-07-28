@@ -4,9 +4,10 @@ from sendgrid.helpers.mail import Mail
 import os
 from app.core.config import settings
 
+print(f"settings.RESEND_API_KEY: {settings.RESEND_API_KEY}")
 resend.api_key = settings.RESEND_API_KEY
 print(f"resend.api_key: {resend.api_key}")
-print(f"settings.RESEND_API_KEY: {settings.RESEND_API_KEY}")
+
 
 async def send_email_code(to_email: str, code: str):
     r = resend.Emails.send(resend.Emails.SendParams(**{
