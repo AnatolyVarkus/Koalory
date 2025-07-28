@@ -1,4 +1,4 @@
-from sqlalchemy import String, DateTime, func, ForeignKey
+from sqlalchemy import String, DateTime, func, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db import Base
 
@@ -11,10 +11,10 @@ class StoriesModel(Base):
     story_name: Mapped[str] = mapped_column(String(255), nullable=True)
     story_age: Mapped[int] = mapped_column(nullable=True)
     story_gender: Mapped[str] = mapped_column(String(255), nullable=True)
-    story_location: Mapped[str] = mapped_column(nullable=True)
-    story_extra: Mapped[str] = mapped_column(nullable=True)
+    story_location: Mapped[str] = mapped_column(Text, nullable=True)
+    story_extra: Mapped[str] = mapped_column(Text, nullable=True)
     story_theme: Mapped[str] = mapped_column(String(255), nullable=True)
-    story_message: Mapped[str] = mapped_column(nullable=True)
+    story_message: Mapped[str] = mapped_column(Text, nullable=True)
     story_language: Mapped[str] = mapped_column(String(255), nullable=True)
     status: Mapped[str] = mapped_column(default="not_started", nullable=True)
     error_message: Mapped[str] = mapped_column(nullable=True)
