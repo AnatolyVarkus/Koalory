@@ -10,7 +10,7 @@ resend.api_key = settings.RESEND_API_KEY
 def send_email_code(to_email: str, code: str):
     print(f"Code: {code}")
     r = resend.Emails.send(resend.Emails.SendParams(**{
-        "from": "Koalory <onboarding@resend.dev>",
+        "from": "Koalory <noreply@koalory.com>",
         "to": [to_email],
         "subject": "Email Verification Code",
         "html": f"<strong>Your code is: {code}</strong>"}))
@@ -21,7 +21,7 @@ def send_reset_email(to_email: str, token: str):
     print(f"URL: {url}")
 
     params = resend.Emails.SendParams(**{
-        "from": "Koalory <onboarding@resend.dev>",
+        "from": "Koalory <noreply@koalory.com>",
         "to": [to_email],
         "subject": "Reset Your Password",
         "html": f"<p>Click <a href=\"{url}\">here</a> to reset your password. This link expires in 1 hour.</p>"})
@@ -30,7 +30,7 @@ def send_reset_email(to_email: str, token: str):
 def send_pdf_email(to_email: str, url: str):
 
     params = resend.Emails.SendParams(**{
-        "from": "Koalory <onboarding@resend.dev>",
+        "from": "Koalory <noreply@koalory.com>",
         "to": [to_email],
         "subject": "Reset Your Password",
         "html": f"""
