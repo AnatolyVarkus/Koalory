@@ -113,7 +113,7 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
 
 def determine_progress(story: StoriesModel) -> str:
     if story.story_creation_ts and story.status == "completed":
-        return "completed"
+        return "finished"
     elif story.story_creation_ts and story.status == "started":
         return "in_progress"
     elif story.story_name is None or story.photo_url is None:
@@ -125,7 +125,7 @@ def determine_progress(story: StoriesModel) -> str:
     elif story.story_theme and story.story_message is None:
         return "story_message"
     else:
-        return "completed"
+        return "finished"
 
 @router.get("/all_stories")
 async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> StoriesResponseSchema:
