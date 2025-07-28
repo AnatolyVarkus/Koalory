@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.routing import APIRoute
 from fastapi.openapi.utils import get_openapi
 from app.core.config import settings
@@ -7,6 +7,7 @@ import re
 import inspect
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.wrapper import CustomRoute
+from app.db import db_functions, AsyncSessionLocal
 from app.core.celery_app import celery
 
 app = FastAPI(
@@ -70,7 +71,12 @@ app.include_router(verification_router)
 #     return app.openapi_schema
 
 @app.get("/health")
-def healthcheck():
+async def healthcheck():
     return {"status": "ok"}
+
+@app.post("/get_info")
+async def get_info(job_id: int = Query(...)):
+    async with AsyncSessionLocal() as session:
+        return await db_functions.get_name_by_job_id(job_id, session)
 
 # app.openapi = custom_openapi
