@@ -27,3 +27,22 @@ def send_reset_email(to_email: str, token: str):
         "html": f"<p>Click <a href=\"{url}\">here</a> to reset your password. This link expires in 1 hour.</p>"})
     r = resend.Emails.send(params)
 
+def send_pdf_email(to_email: str, url: str):
+
+    params = resend.Emails.SendParams(**{
+        "from": "Koalory <onboarding@resend.dev>",
+        "to": [to_email],
+        "subject": "Reset Your Password",
+        "html": f"""
+    <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+        <p>Your story is ready!</p>
+        <p>
+            You can check it out here:
+            <a href="{url}" style="color: #1a73e8; text-decoration: none;">
+                <strong>Click to view your story</strong>
+            </a>
+        </p>
+        <p style="margin-top: 20px;">Enjoy!</p>
+    </div>
+""".strip()})
+    r = resend.Emails.send(params)

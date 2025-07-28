@@ -9,6 +9,7 @@ from app.models.stories import StoriesModel
 from app.models import PaymentsModel
 from typing import Dict, List
 from app.core import settings
+from app.services.email_sender_service import send_pdf_email
 from app.core.ai_prompts import ai_prompts
 from app.services.stripe_service import count_available_stories
 from app.services.ai_photo_generation import AIPhotoGenerator
@@ -183,5 +184,6 @@ class StoryGeneratorService:
 
                 full_file_name = upload_pdf(file_name, pdf_bytes)
                 await self.update_story(result["title"], result["body"], full_file_name, unique_story_uuid)
+                send_pdf_email(user.email, full_file_name)
 
 
