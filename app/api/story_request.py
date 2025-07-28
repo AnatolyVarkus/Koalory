@@ -98,7 +98,7 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
                 return StoryResponseSchema(progress=100, title=story.story_title, text=get_text_before_illustrations(story.story_text),
                                            images=[story.illustration_1, story.illustration_2], pdf_url=story.story_url,
                                            email=story.user.email, word_count=len(re.findall(r'\b\w+\b', story.story_text)))
-            elif story.status == "started" and story.error_message is not None:
+            elif story.status == "error":
                 raise HTTPException(status_code=400, detail={"type": "error", "target": "story_detail", "reason": story.error_message})
             elif story.story_creation_ts:
                 progress = int(((int(time()) - story.story_creation_ts) / variables.STORY_CREATION_TIME_FRAME) * 100)
@@ -112,9 +112,7 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
 
 
 def determine_progress(story: StoriesModel) -> str:
-    from sqlalchemy.inspection import inspect
-    for attr in inspect(story).mapper.column_attrs:
-        print(f"{attr.key} = {getattr(story, attr.key)}")
+
     if story.story_creation_ts and story.status == "completed":
         return "finished"
     elif story.story_creation_ts and story.status == "started":

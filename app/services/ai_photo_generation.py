@@ -132,12 +132,12 @@ class AIPhotoGenerator:
         Full pipeline: analyze photo, build prompt, generate image
         Returns image URL or raises error
         """
-        photo_description = await self.analyze_photo(story, photo_bytes)
-        await self.update_description(job_id, photo_description)
-        # prompt = await self.build_prompt(story, photo_description)
-        image_generation_id = await self.generate_avatar(photo_description)
-        tries = 0
         try:
+            photo_description = await self.analyze_photo(story, photo_bytes)
+            await self.update_description(job_id, photo_description)
+            # prompt = await self.build_prompt(story, photo_description)
+            image_generation_id = await self.generate_avatar(photo_description)
+            tries = 0
             while tries < 6:
                 await asyncio.sleep(2)
                 try:
