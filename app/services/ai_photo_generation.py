@@ -173,7 +173,7 @@ class AIPhotoGenerator:
         print(f"PROMPTS = {prompts}")
         generated_images = []
         for prompt in prompts:
-            image = await self.generate_avatar(prompt)
+            image = await self.generate_avatar(prompt+f"\n Extra character description: \n {character_description}")
             tries = 0
             while tries < 6:
                 try:

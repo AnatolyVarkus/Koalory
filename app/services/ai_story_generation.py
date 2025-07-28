@@ -107,6 +107,7 @@ class StoryGeneratorService:
 
         async with CeleryAsyncSessionLocal() as session:
             story: StoriesModel = await get_story_by_job_id(self.job_id, session)
+            user: UsersModel = await check_user(self.user_id, session)
             stories = await get_all_user_stories(int(self.user_id), session)
             total_stories = len(stories)
             story.status = "started"
@@ -144,7 +145,7 @@ class StoryGeneratorService:
                 for _ in range(max_tries):
                     try:
                         photo_generator = AIPhotoGenerator()
-                        urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], "")
+                        urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], user.description)
                         unique_story_uuid = str(uuid4())
                         for i, url in enumerate(urls, 1):
                             upload_image(url, f"photo_{i}_{unique_story_uuid}.png")
