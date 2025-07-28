@@ -43,7 +43,7 @@ class Variables(BaseModel):
                         "story_language"
                         ]
     PHOTO_CREATION_TIME_FRAME: int = 15  # secs
-    STORY_CREATION_TIME_FRAME: int = 300  # secs
+    STORY_CREATION_TIME_FRAME: int = 100  # secs
     KOALORY_PHOTO_URL: str = "https://koalory.com/photo"
     KOALORY_STORY_URL: str = "https://koalory.com/story"
     SUBSCRIPTIONS: dict = {
