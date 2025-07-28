@@ -1,6 +1,8 @@
 import os
 import resend
 from app.core.config import settings
+import base64
+from pathlib import Path
 
 # Set Resend API key
 resend.api_key = settings.RESEND_API_KEY
@@ -59,6 +61,10 @@ def send_pdf_email(to_email: str, url: str):
     Sends an email with a link to the generated story PDF.
     """
     print(f"[DEBUG] Story URL: {url}")
+    file_path = Path(__file__).parent.parent / "your_story_is_ready.png"
+
+    with open(file_path, "rb") as f:
+        attachment_content = base64.b64encode(f.read()).decode()
 
     params = resend.Emails.SendParams(**{
         "from": "Koalory <noreply@koalory.com>",
@@ -74,7 +80,13 @@ def send_pdf_email(to_email: str, url: str):
                 </p>
                 <p style="margin-top: 20px;">Enjoy the adventure!</p>
             </div>
-        """.strip()
+        """.strip(),
+        "attachments": [
+            {
+                "content": attachment_content,
+                "filename": "your_story_is_ready.png"
+            }
+        ]
     })
 
     return resend.Emails.send(params)
