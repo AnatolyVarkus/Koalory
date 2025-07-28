@@ -80,7 +80,7 @@ class StoryGeneratorService:
             result["body"] = body_match.group(1).strip()
 
         # 3. Extract prompts n1: ... n6:
-        prompts = re.findall(r"n\d+:\s*(.*?)(?=\n+n\d+:|$)", text, re.DOTALL)
+        prompts = re.findall(r"\[N\d\]\s*(.*?)(?=\n\[N\d\]|\Z)", text, re.DOTALL)
         result["illustration_prompts"] = [p.strip() for p in prompts]
 
         print(f"result: {result}")

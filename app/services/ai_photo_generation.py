@@ -146,6 +146,7 @@ class AIPhotoGenerator:
                         break
                 except:
                     pass
+
                 tries += 1
         except Exception as e:
             return HTTPException(status_code=400, detail={"type": "error", "target": "first_screen", "reason": e})
