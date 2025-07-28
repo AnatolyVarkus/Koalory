@@ -70,18 +70,19 @@ class StoryGeneratorService:
         }
 
         # 1. Вырезаем title
-        title_match = re.search(r"\*\*story_title:\*\*\s*(.*?)\n", text)
+        title_match = re.search(r"\[TITL\]\s*(.*?)\n", text)
         if title_match:
             result["title"] = title_match.group(1).strip()
 
-        # 2. Extract **story_body:** ... until **illustration_prompts:**
-        body_match = re.search(r"\*\*story_body:\*\*\s*(.*?)\*\*illustration_prompts:\*\*", text, re.DOTALL)
+        # 2. Extract [STRY] ... until [ILLUS]
+        body_match = re.search(r"\[STRY\]\s*(.*?)\[ILLUS\]", text, re.DOTALL)
         if body_match:
             result["body"] = body_match.group(1).strip()
 
-        # 3. Extract prompts like n1: ... n2: ...
+        # 3. Extract prompts n1: ... n6:
         prompts = re.findall(r"n\d+:\s*(.*?)(?=\n+n\d+:|$)", text, re.DOTALL)
         result["illustration_prompts"] = [p.strip() for p in prompts]
+
         print(f"result: {result}")
         return result
 
