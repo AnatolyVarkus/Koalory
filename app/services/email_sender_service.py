@@ -66,27 +66,25 @@ def send_pdf_email(to_email: str, url: str):
     with open(file_path, "rb") as f:
         attachment_content = base64.b64encode(f.read()).decode()
 
+    image_url = "https://storage.googleapis.com/koalory_bucket/your_story_is_ready.png"
+
     params = resend.Emails.SendParams(**{
         "from": "Koalory <noreply@koalory.com>",
         "to": [to_email],
         "subject": "Your Story is Ready!",
         "html": f"""
             <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+                <img src="{image_url}" alt="Koalory Banner"
+                     style="width: 100%; max-width: 600px; height: auto; display: block; margin-bottom: 20px;" />
                 <p>Your story is ready!</p>
                 <p>
-                    <a href="{url}" style="color: #1a73e8; text-decoration: none;">
-                        <strong>Click here to view your story</strong>
+                    <a href="{url}" style="color: #1a73e8; text-decoration: none; font-weight: bold;">
+                        Click here to view your story
                     </a>
                 </p>
                 <p style="margin-top: 20px;">Enjoy the adventure!</p>
             </div>
-        """.strip(),
-        "attachments": [
-            {
-                "content": attachment_content,
-                "filename": "your_story_is_ready.png"
-            }
-        ]
+            """.strip()
     })
 
     return resend.Emails.send(params)
