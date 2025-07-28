@@ -73,9 +73,9 @@ def send_pdf_email(to_email: str, story_url: str):
             <p>Your personal story is ready! 🎉</p>
 
             <p style="margin: 20px 0;">
-                <a href="{story_url}" style="display: inline-block; background-color: #1a73e8; color: #fff;
+                <a href="{story_url}" style="display: inline-block; background-color: #FC7B00; color: #fff;
                 padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    👆 READ YOUR STORY
+                    READ YOUR STORY
                 </a>
             </p>
 
@@ -98,7 +98,7 @@ def send_pdf_email(to_email: str, story_url: str):
             <p style="margin: 20px 0;">
                 <a href="https://story.koalory.com/pricing" style="display: inline-block; background-color: #34a853; color: #fff;
                 padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    👉 GET 3 STORIES FOR $5.99
+                    GET 3 STORIES FOR $5.99
                 </a>
             </p>
 
