@@ -7,7 +7,7 @@ from app.core.config import settings
 resend.api_key = settings.RESEND_API_KEY
 
 #
-async def send_email_code(to_email: str, code: str):
+def send_email_code(to_email: str, code: str):
     print(f"Code: {code}")
     r = resend.Emails.send(resend.Emails.SendParams(**{
         "from": "Koalory <onboarding@resend.dev>",

@@ -16,7 +16,7 @@ router = APIRouter(prefix="/verification", route_class=CustomRoute)
 async def create_verification(data: EmailRequest) -> SuccessfulSubmission:
     code = generate_verification_code()
     save_verification_code(data.email, code)
-    await send_email_code(data.email, code)
+    send_email_code(data.email, code)
     return SuccessfulSubmission(success=True)
 
 

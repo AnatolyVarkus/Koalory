@@ -61,7 +61,7 @@ async def request_password_reset(payload: ResetRequest) -> SuccessfulSubmission:
             raise HTTPException(status_code=404, detail="User not found")
 
         token = generate_reset_token(user.email)
-        await send_reset_email(user.email, token)
+        send_reset_email(user.email, token)
     return SuccessfulSubmission(success=True)
 
 
