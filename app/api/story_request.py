@@ -112,8 +112,10 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
 
 
 def determine_progress(story: StoriesModel) -> str:
-    if story.story_creation_ts:
+    if story.story_creation_ts and story.status == "finished":
         return "finished"
+    elif story.story_creation_ts and story.status == "started":
+        return "in_progress"
     elif story.story_name is None or story.photo_url is None:
         return "first_screen"
     elif story.photo_url and story.story_extra is None:
