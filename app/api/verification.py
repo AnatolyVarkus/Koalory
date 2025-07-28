@@ -6,8 +6,10 @@ from app.services.email_sender_service import send_email_code  # You must implem
 from app.db import AsyncSessionLocal
 from app.models import UsersModel
 from app.db import get_user_by_email
+from app.core.wrapper import CustomRoute
 
-router = APIRouter(prefix="/verification")
+
+router = APIRouter(prefix="/verification", route_class=CustomRoute)
 
 
 @router.post("/create")
