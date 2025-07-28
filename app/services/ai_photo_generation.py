@@ -137,15 +137,20 @@ class AIPhotoGenerator:
         # prompt = await self.build_prompt(story, photo_description)
         image_generation_id = await self.generate_avatar(photo_description)
         tries = 0
-        while tries < 6:
-            await asyncio.sleep(2)
-            try:
-                link = await self.run_secondary(image_generation_id, job_id)
-                if link:
-                    break
-            except:
-                pass
-            tries += 1
+        try:
+            while tries < 6:
+                await asyncio.sleep(2)
+                try:
+                    link = await self.run_secondary(image_generation_id, job_id)
+                    if link:
+                        break
+                except:
+                    pass
+                tries += 1
+        except Exception as e:
+            return HTTPException(status_code=400, detail={"type": "error", "target": "first_screen", "reason": e})
+
+
 
 
 

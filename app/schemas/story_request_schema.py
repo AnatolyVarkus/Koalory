@@ -26,3 +26,4 @@ class AvailableStoriesSchema(BaseModel):
 
 class SuccessResponseSchema(BaseModel):
     job_id: int
+

@@ -33,15 +33,25 @@ class PDFWithImages(FPDF):
 
 
 def normalize_ascii(text: str) -> str:
-    return (
-        text.replace("–", "-")
-            .replace("—", "-")
-            .replace("‘", "'")
-            .replace("’", "'")
-            .replace("“", '"')
-            .replace("”", '"')
-    )
+    try:
+        text = (
+            text.replace("–", "-")
+                .replace("—", "-")
+                .replace("‘", "'")
+                .replace("’", "'")
+                .replace("“", '"')
+                .replace("”", '"')
+        )
+    except Exception as e:
+        pass
+    return text
 
+def test_text(body: str):
+    try:
+        parts = re.split(r"ILLUSTRATION_(\d)", body)
+    except Exception as e:
+        return False
+    return True
 
 def generate_pdf(title: str, body: str, image_urls: list[bytes]):
     image_map = {}
