@@ -71,7 +71,7 @@ Instructions:
         Returns:
             str: Полный промпт для Claude API
         """
-        story.story_language = "english"
+        # story.story_language = "english"
         prompt = f"""Используйте следующую информацию о персонаже: {hero_description}
 ## Жанр истории:
 {story.story_theme}

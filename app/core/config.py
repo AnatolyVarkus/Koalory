@@ -39,7 +39,8 @@ class Variables(BaseModel):
                         "story_location",
                         "story_extra",
                         "story_theme",
-                        "story_message"
+                        "story_message",
+                        "story_language"
                         ]
     PHOTO_CREATION_TIME_FRAME: int = 15  # secs
     STORY_CREATION_TIME_FRAME: int = 300  # secs
