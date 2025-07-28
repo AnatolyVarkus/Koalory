@@ -62,7 +62,7 @@ def send_pdf_email(to_email: str, story_url: str):
     params = resend.Emails.SendParams(**{
         "from": "Koalory <noreply@koalory.com>",
         "to": [to_email],
-        "subject": "✨ Your personal story is ready! + special offer inside",
+        "subject": "Your personal story is ready!",
         "html": f"""
         <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.6; max-width: 600px; margin: auto;">
             <img src="{image_url}" alt="Koalory Banner"
