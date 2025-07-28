@@ -56,13 +56,13 @@ class FormHandlerService:
                 story: StoriesModel = result.scalar_one_or_none()
                 if story:
                     self.update_field(story, field_name, value)
-                    if field_name == "story_message":
-                        story.story_creation_ts = int(time())
+                    # if field_name == "story_message":
+                    #     story.story_creation_ts = int(time())
                     await session.commit()
                     await session.refresh(story)
-                    if field_name == "story_message":
-                        from app.tasks.story_task import run_story_generation
-                        run_story_generation.delay(user_id, job_id)
+                    # if field_name == "story_message":
+                    #     from app.tasks.story_task import run_story_generation
+                    #     run_story_generation.delay(user_id, job_id)
                     return story.id
                 else:
                     raise HTTPException(status_code=404, detail="Story not found")

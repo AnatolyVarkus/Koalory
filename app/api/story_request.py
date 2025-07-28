@@ -70,11 +70,11 @@ async def launch_story_generation(job_id: int = Query(...),
             select(StoriesModel).where(and_(StoriesModel.id == job_id, StoriesModel.user_id == int(user_id))))
         story: StoriesModel = result.scalar_one_or_none()
 
-        if story.story_creation_ts is None:
+        if story.status != "finished" and story.status != "started":
 
-            story.story_creation_ts = int(time())
-            await session.commit()
-            await session.refresh(story)
+            # story.story_creation_ts = int(time())
+            # await session.commit()
+            # await session.refresh(story)
 
             from app.tasks.story_task import run_story_generation
             run_story_generation.delay(user_id, job_id)

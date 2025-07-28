@@ -111,6 +111,7 @@ class StoryGeneratorService:
             stories = await get_all_user_stories(int(self.user_id), session)
             total_stories = len(stories)
             story.status = "started"
+            story.story_creation_ts = int(time())
             story.error_message = None
 
             result = await session.execute(
