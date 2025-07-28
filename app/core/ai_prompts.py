@@ -25,10 +25,16 @@ class AIPrompts:
         Returns:
             str: Полный промпт для Leonardo AI
         """
+        if story.story_gender == "boy":
+            gender = "male"
+        elif story.story_gender == "girl":
+            gender = "female"
+        else:
+            gender = "other"
 
         prompt = f"""Describe this person from this picture following these steps: 
 
-Step 1: Character Name: {story.story_name} - Character Age: {story.story_age} - Character Gender: {story.story_gender} - Place of Residence: {story.story_location}
+Step 1: Character Name: {story.story_name} - Character Age: {story.story_age} - Character Gender: {gender} - Place of Residence: {story.story_location}
 
 Step 2: Additional parameters (will be determined based on the uploaded image) - Hairstyle (examples: Bald, Pixie Cut, Bald, Buzz Cut, Crew Cut, Bob Cut, Lob, Layered Cut, Undercut, French Bob, V-Cut, U-Cut, Feathered Cut, Curly Bob, Beach Waves, Afro, Ringlets, Spiral Curls, Classic Bun, Top Knot, Chignon, Braided Bun, Messy Bun, Classic Braid, French Braid, Dutch Braid, Fishtail Braid, Cornrows, High Ponytail, Low Ponytail, Side Ponytail, Braided Ponytail, Bubble Ponytail, Pompadour, Quiff, Slick Back, Side Part, Mohawk, Dreadlocks, Man Bun, Emo Cut, Mullet, Straight Across Bangs, Side-Swept Bangs, Curtain Bangs, Wispy Bangs, Blunt Bangs, Caesar Cut, French Crop, Ivy League Cut, Buzz Cut Fade, High and Tight, Taper Fade Pixie, Textured Crop, Textured Crop with Fade, Wolf Cut, Hime Cut, Pageboy Cut, Asymmetrical Bob, Stacked Bob, Razor Cut, Wedge Cut, Long Layers with Curtain Bangs, Half-Up Half-Down, Finger Waves, Wet Look, Pineapple Updo, Bantu Knots, Braided Bantu Knots, Box Braids, Box Braids with Color Extensions, Chunky Braids, Statement Braids, Decorated Braids, High Braided Ponytail, Jumbo Braids, Braids with Accessories, Street Braids, Feed-in Braids, Two Statement Braids, Viking Braids (inspired), Senegalese Twists, Marley Twists, Flat Twists, Space Buns, Victory Rolls, Short Layered Pixie, Tapered Pixie): - Skin Tone (Fair, Light, Dark, Deep, Honey, Caramel, Chocolate, Ebony, etc.): - Eye Color (examples: dark brown, green, blue, etc.): - Accessories (examples: Glasses, Headband, etc.): - Facial Hair Details (Mustache, Beard, full beard, Goatee, Sideburns, Stubble, etc.): 
 
