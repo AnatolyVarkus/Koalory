@@ -25,6 +25,7 @@ class AIPrompts:
         Returns:
             str: Полный промпт для Leonardo AI
         """
+        print(f"story.story_gender: {story.story_gender}")
         if story.story_gender == "boy":
             gender = "male"
         elif story.story_gender == "girl":
