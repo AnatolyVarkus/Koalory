@@ -55,6 +55,7 @@ class StoryGeneratorService:
                     )
                 ]
             )
+            print(f"response.content[0].text: {response.content[0].text}")
             return response.content[0].text  # Assuming you want just the text content
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Claude API error: {str(e)}")
@@ -162,6 +163,11 @@ class StoryGeneratorService:
                             story.error_message = "We couldn't generate your story, change the details"
                             await session.commit()
                             return None
+                else:
+                    story.status = "error"
+                    story.error_message = "We couldn't generate your story, change the details"
+                    await session.commit()
+                    return None
 
                 pdf_bytes = generate_pdf(result["title"], result["body"], urls)
 
