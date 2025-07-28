@@ -24,7 +24,9 @@ async def send_reset_email(to_email: str, token: str):
         "to": [to_email],
         "subject": "Reset Your Password",
         "html": f"<p>Click <a href=\"{url}\">here</a> to reset your password. This link expires in 1 hour.</p>"}
-
-    r = resend.Emails.send(params)
+    try:
+        r = resend.Emails.send(params)
+    except Exception as e:
+        print(f"Exception: {e}")
 
 
