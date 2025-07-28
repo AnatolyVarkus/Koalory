@@ -27,6 +27,7 @@ class Settings(BaseModel):
     CELERY_BROKER_URL: str = "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND: str ="redis://localhost:6379/1"
     STRIPE_WEBHOOK_SECRET: str = os.environ.get("STRIPE_WEBHOOK_SECRET")
+    RESEND_API_KEY: str = os.environ.get("RESEND_API_KEY")
 
 
 

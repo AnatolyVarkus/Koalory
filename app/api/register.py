@@ -21,4 +21,4 @@ async def email_register_request(payload: EmailRequestSchema):
     user_id = await service.register()
     access_token = jwt_service.create_access_token(user_id)
     refresh_token = jwt_service.create_refresh_token(user_id)
-    return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+    return LoginResponse(access_token="", refresh_token="")
