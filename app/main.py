@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from fastapi.openapi.utils import get_openapi
 from app.core.config import settings
-from app.api import auth_router, register_router, form_router, payment_router, story_request_router
+from app.api import auth_router, register_router, form_router, payment_router, story_request_router, verification_router
 import re
 import inspect
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +29,7 @@ app.include_router(register_router)
 app.include_router(form_router)
 app.include_router(payment_router)
 app.include_router(story_request_router)
+app.include_router(verification_router)
 
 # def custom_openapi():
 #     if app.openapi_schema:
