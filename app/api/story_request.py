@@ -70,7 +70,7 @@ async def launch_story_generation(job_id: int = Query(...),
             select(StoriesModel).where(and_(StoriesModel.id == job_id, StoriesModel.user_id == int(user_id))))
         story: StoriesModel = result.scalar_one_or_none()
 
-        if story.status != "finished" and story.status != "started":
+        if story.status != "completed" and story.status != "started":
 
             # story.story_creation_ts = int(time())
             # await session.commit()
