@@ -23,24 +23,6 @@ async def check_user(user_id: int, db):
     user = result.scalar_one_or_none()
     return user
 
-async def get_name_by_job_id(job_id: int, db):
-    from app.models import StoriesModel, UsersModel
-
-    # Get the story
-    stmt = select(StoriesModel).where(StoriesModel.id == int(job_id))
-    result = await db.execute(stmt)
-    story = result.scalar_one_or_none()
-    if not story:
-        return None
-
-    # Get the user who owns the story
-    stmt = select(UsersModel).where(UsersModel.id == story.user_id)
-    result = await db.execute(stmt)
-    user = result.scalar_one_or_none()
-    if not user:
-        return None
-
-    return user.name
 
 async def get_story_by_job_id(job_id: int, db):
     from app.models import StoriesModel

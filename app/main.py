@@ -77,6 +77,6 @@ async def healthcheck():
 @app.post("/get_info")
 async def get_info(job_id: int = Query(...)):
     async with AsyncSessionLocal() as session:
-        return await db_functions.get_name_by_job_id(job_id, session)
+        return {"name":(await db_functions.get_story_by_job_id(job_id, session)).story_name}
 
 # app.openapi = custom_openapi
