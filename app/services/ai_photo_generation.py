@@ -10,7 +10,7 @@ import asyncio
 from app.services.google_storage_service import upload_avatar
 from app.services.ai_photo_analysis import GPTVisionClient
 import asyncio
-from app.db import AsyncSessionLocal, check_user
+from app.db import AsyncSessionLocal, get_story_by_job_id
 from sqlalchemy import select, and_
 import requests
 from uuid import uuid4
@@ -120,10 +120,10 @@ class AIPhotoGenerator:
             story.photo_url = f"{image_generation_id}"
             await session.commit()
 
-    async def update_description(self, user_id: int, photo_description: str):
+    async def update_description(self, job_id: int, photo_description: str):
         async with AsyncSessionLocal() as session:
-            user = await check_user(user_id, session)
-            user.description = photo_description
+            story = await get_story_by_job_id(job_id, session)
+            story.user_description = photo_description
             await session.commit()
 
 
@@ -133,7 +133,7 @@ class AIPhotoGenerator:
         Returns image URL or raises error
         """
         photo_description = await self.analyze_photo(story, photo_bytes)
-        await self.update_description(user_id, photo_description)
+        await self.update_description(job_id, photo_description)
         # prompt = await self.build_prompt(story, photo_description)
         image_generation_id = await self.generate_avatar(photo_description)
         tries = 0

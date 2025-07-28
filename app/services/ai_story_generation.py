@@ -40,7 +40,7 @@ class StoryGeneratorService:
         async with CeleryAsyncSessionLocal() as session:
             story = await get_story_by_job_id(self.job_id, session)
             user = await check_user(self.user_id, session)
-            return ai_prompts.get_story_generation_prompt(story, user.description)
+            return ai_prompts.get_story_generation_prompt(story, story.user_description)
 
     async def query_claude(self, prompt: str):
         try:
@@ -148,7 +148,7 @@ class StoryGeneratorService:
                 for _ in range(max_tries):
                     try:
                         photo_generator = AIPhotoGenerator()
-                        urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], user.description)
+                        urls = await photo_generator.generate_6_illustrations(result["illustration_prompts"], story.user_description)
                         unique_story_uuid = str(uuid4())
                         for i, url in enumerate(urls, 1):
                             upload_image(url, f"photo_{i}_{unique_story_uuid}.png")

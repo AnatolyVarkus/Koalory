@@ -8,6 +8,8 @@ class StoriesModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
+    user_description: Mapped[str] = mapped_column(nullable=True)
+
     story_name: Mapped[str] = mapped_column(String(255), nullable=True)
     story_age: Mapped[int] = mapped_column(nullable=True)
     story_gender: Mapped[str] = mapped_column(String(255), nullable=True)
