@@ -47,7 +47,7 @@ class Variables(BaseModel):
     SUBSCRIPTIONS: dict = {
         "one": {"price": 250, "name": "First Story Package"},
         "three": {"price": 599, "name": "Three Stories Package"},
-        "ten": {"price": 1999, "name": "Ten Stories Package"}
+        "ten": {"price": 1499, "name": "Ten Stories Package"}
     }
 
 settings = Settings()

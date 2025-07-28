@@ -1,5 +1,5 @@
 from .database import AsyncSessionLocal
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 async def db_add(obj: object, db):
     try:
@@ -50,3 +50,9 @@ async def get_all_user_stories(user_id: int, session):
     result = await session.execute(stmt)
     stories = result.scalars().all()
     return stories
+
+async def delete_user_by_id(user_id: int, session):
+    from app.models import UsersModel
+    stmt = delete(UsersModel).where(UsersModel.id == user_id)
+    await session.execute(stmt)
+    await session.commit()

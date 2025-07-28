@@ -44,7 +44,7 @@ class CustomRoute(APIRoute):
                         "error": http_exc.detail
                     }
                 )
-
+            
             except Exception as e:
                 return JSONResponse(
                     status_code=500,

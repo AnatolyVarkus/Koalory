@@ -3,9 +3,13 @@ from fastapi import APIRouter, HTTPException
 from app.schemas.register_schema import GoogleRequestSchema, EmailRequestSchema
 from app.services import (verify_google_token, email_authorize, jwt_service, RegisterUserService)
 from app.db import get_user_by_email, AsyncSessionLocal
-from app.schemas.auth_schema import LoginResponse
+from app.schemas.auth_schema import LoginResponse, ResetRequest, ResetVerificationRequest, SuccessfulSubmission
+from app.services.reset_token_service import generate_reset_token, verify_reset_token
+from app.services.email_sender_service import send_reset_email
+from passlib.context import CryptContext
 
 router = APIRouter(prefix="/auth", route_class=CustomRoute)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/google_login")
 async def google_login(payload: GoogleRequestSchema) -> LoginResponse:
@@ -41,9 +45,38 @@ async def submit_refresh_token(refresh_token: str) -> LoginResponse:
     new_refresh = jwt_service.create_refresh_token(user_id)
     return LoginResponse(access_token=new_access, refresh_token=new_refresh)
 
-@router.post("/test_auth")
-async def test_auth() -> LoginResponse:
-    user_id = 123  # Dummy user ID for testing
-    access_token = jwt_service.create_access_token(user_id)
-    refresh_token = jwt_service.create_refresh_token(user_id)
-    return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+# @router.post("/test_auth")
+# async def test_auth() -> LoginResponse:
+#     user_id = 123  # Dummy user ID for testing
+#     access_token = jwt_service.create_access_token(user_id)
+#     refresh_token = jwt_service.create_refresh_token(user_id)
+#     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post("/reset")
+async def request_password_reset(payload: ResetRequest) -> SuccessfulSubmission:
+    async with AsyncSessionLocal() as session:
+        user = await get_user_by_email(payload.email, session)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        token = generate_reset_token(user.email)
+        await send_reset_email(user.email, token)
+    return SuccessfulSubmission(success=True)
+
+
+@router.post("/reset_verification")
+async def reset_password(payload: ResetVerificationRequest) -> SuccessfulSubmission:
+    try:
+        email = verify_reset_token(payload.token)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    async with AsyncSessionLocal() as session:
+        user = await get_user_by_email(email, session)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        user.hashed_password = str(pwd_context.hash(payload.password))
+        await session.commit()
+    return SuccessfulSubmission(success=True)
