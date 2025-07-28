@@ -104,7 +104,7 @@ Instructions:
  4. В начале должны указываться возраст персонажа и его пол, имя
  5. Стиль изображения должен указываться в конце
  6. Иллюстрации должны быть разных ракурсов и форматов, например: близкий кадр героя с размытым фоном, герой в полный рост на фоне детально описанной локации, герой издалека стоящий спиной и наблюдающий за локацией, средняя дистанция, эмоции героя, важные предметы близко и тд
- 7. Don’t use words: ukraine, war, battle, religion, looking under, shooting, pot, mushroom, under, choker, below, low angle, thorny, needle, trip, portrait etc that is restricted to use with child content
+ 7. Don’t use words: ukraine, war, battle, religion, looking under, shooting, pot, mushroom, under, choker, below, low angle, thorny, needle, lounge, trip, portrait etc that is restricted to use with toddler-child content
  8. This prompt is intended for generating friendly, safe, and age-appropriate children’s illustrations. Avoid any references to nudity, suggestive clothing, body parts, chokers, shooting, below, low angle, or phrases like ‘looking under’. Do not use camera angles or poses that can be interpreted as voyeuristic. Use soft, imaginative, and wholesome descriptions suitable for children’s books or cartoons. The image must be safe for work (SFW) and child-appropriate
 ## ВАЖНО
 Сначала проанализируй текст и если текст содержит запрещенные, нелегальные слова, останови генерацию и выведи сообщение об ошибке. Если все хорошо, сразу начинай генерацию"""
