@@ -112,6 +112,9 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
 
 
 def determine_progress(story: StoriesModel) -> str:
+    from sqlalchemy.inspection import inspect
+    for attr in inspect(story).mapper.column_attrs:
+        print(f"{attr.key} = {getattr(story, attr.key)}")
     if story.story_creation_ts and story.status == "completed":
         return "finished"
     elif story.story_creation_ts and story.status == "started":
