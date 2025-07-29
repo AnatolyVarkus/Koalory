@@ -11,6 +11,8 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.orm import selectinload
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from time import time
+from datetime import datetime, timezone, timedelta
+from sqlalchemy import delete
 
 auth_scheme = HTTPBearer()
 
@@ -138,19 +140,35 @@ async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_s
     async with AsyncSessionLocal() as session:
         stories = await get_all_user_stories(user_id, session)
         user = await check_user(user_id, session)
-    all_stories = []
-    for story in stories:
-        all_stories.append(StorySchema(title=story.story_title, image=story.photo_url, job_id=story.id, theme=story.story_theme,
-                                       progress=determine_progress(story)))
 
-    if user.subscription == "one":
-        max_stories = 1
-    elif user.subscription == "three":
-        max_stories = 3
-    elif user.subscription == "ten":
-        max_stories = 10
-    else:
-        max_stories = 1
+        all_stories = []
+        delete_ids = []
+
+        now = datetime.now(timezone.utc)
+        cutoff = now - timedelta(seconds=10)
+
+        for story in stories:
+            if story.story_name is None and story.created_at < cutoff:
+                delete_ids.append(story.id)
+            else:
+                all_stories.append(StorySchema(
+                    title=story.story_title,
+                    image=story.photo_url,
+                    job_id=story.id,
+                    theme=story.story_theme,
+                    progress=determine_progress(story)
+                ))
+
+        if delete_ids:
+            await session.execute(delete(StoriesModel).where(StoriesModel.id.in_(delete_ids)))
+
+        await session.commit()
+
+    max_stories = {
+        "one": 1,
+        "three": 3,
+        "ten": 10
+    }.get(user.subscription, 1)
 
     return StoriesResponseSchema(max_stories=max_stories, stories=all_stories)
 
