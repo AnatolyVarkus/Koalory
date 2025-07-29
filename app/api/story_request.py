@@ -148,8 +148,10 @@ async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_s
         cutoff = now - timedelta(seconds=10)
 
         for story in stories:
+            print(f"{story.story_name}: {story.created_at}")
             if story.story_name is None and story.created_at < cutoff:
                 delete_ids.append(story.id)
+                print(f"DELETED")
             else:
                 all_stories.append(StorySchema(
                     title=story.story_title,
@@ -158,6 +160,7 @@ async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_s
                     theme=story.story_theme,
                     progress=determine_progress(story)
                 ))
+                print(f"KEPT")
 
         if delete_ids:
             await session.execute(delete(StoriesModel).where(StoriesModel.id.in_(delete_ids)))
