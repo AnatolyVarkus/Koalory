@@ -1,6 +1,6 @@
 from celery import Celery
 from app.core import settings  # assuming you have Redis/host info in your settings
-from app.tasks import story_task  # force-load the module
+from app.tasks import story_task, photo_task  # force-load the module
 
 celery = Celery(
     'worker',
