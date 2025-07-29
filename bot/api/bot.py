@@ -1,28 +1,21 @@
-import os
-import asyncio
 import logging
-from aiogram import Bot, Dispatcher, types
-from aiogram.enums.parse_mode import ParseMode
-from aiogram.filters import CommandStart
-from aiogram.types import Message
-
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from bot.services.analytics_service import gather_analytics
 from bot.db import AsyncSessionLocal
 from bot.core import settings
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # make sure this is set
-bot = Bot(token=settings.TG_TOKEN, parse_mode=ParseMode.HTML)
-dp = Dispatcher()
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-@dp.message(CommandStart())
-async def handle_start(message: Message):
-    if message.from_user.id in settings.ALLOWED_USER_IDS:
+    if update.effective_user.id in settings.ALLOWED_USER_IDS:
         async with AsyncSessionLocal() as session:
             report = await gather_analytics(session)
-        await message.answer(report)
+        await update.message.reply_text(report, parse_mode="HTML")
     else:
-        await message.answer("You are not authorized to use this command. \n\nContact @AnatolyVarkus")
+        await update.message.reply_text("You are not authorized to use this command. \n\nContact @AnatolyVarkus")
 
 def run():
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(dp.start_polling(bot))
+    app = ApplicationBuilder().token(settings.TG_TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.run_polling()
