@@ -130,7 +130,7 @@ class AIPhotoGenerator:
             await session.commit()
 
 
-    async def run(self, story: StoriesModel, photo_bytes: bytes, job_id: int, user_id: int):
+    async def run(self, photo_bytes: bytes, job_id: int, user_id: int):
         """
         Full pipeline: analyze photo, build prompt, generate image
         Returns image URL or raises error

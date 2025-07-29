@@ -44,7 +44,7 @@ class FormHandlerService:
                 await session.refresh(story)
                 if photo:
                     from app.tasks.photo_task import run_photo_generation
-                    run_photo_generation.delay(story, photo, job_id, user_id)
+                    run_photo_generation.delay(photo, job_id, user_id)
                 return story.id
             else:
                 raise HTTPException(status_code=404, detail="Story not found")
