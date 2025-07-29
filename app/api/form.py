@@ -40,13 +40,18 @@ async def submit_first_screen(
     photo: UploadFile = File(...),
     credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)
 ) -> SuccessfulSubmission:
-    if credentials.scheme.lower() != "bearer":
-        raise HTTPException(status_code=401, detail="Invalid authentication scheme")
-    payload = jwt_service.decode_jwt(credentials.credentials)
-    user_id = payload.get("sub")
+    try:
+        if credentials.scheme.lower() != "bearer":
+            raise HTTPException(status_code=401, detail="Invalid authentication scheme")
+        payload = jwt_service.decode_jwt(credentials.credentials)
+        user_id = payload.get("sub")
 
-    job_id = await form_handler_service.handler_update_first_screen(int(user_id), job_id, name, gender, age, location, await normalize_image(photo))
-    return SuccessfulSubmission(job_id=job_id)
+        job_id = await form_handler_service.handler_update_first_screen(int(user_id), job_id, name, gender, age, location, await normalize_image(photo))
+        return SuccessfulSubmission(job_id=job_id)
+    except Exception as e:
+        import traceback
+        print("Exception:", e)
+        traceback.print_exc()
 
 async def normalize_image(photo: UploadFile) -> bytes:
     image = Image.open(BytesIO(await photo.read()))
