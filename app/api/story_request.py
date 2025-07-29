@@ -137,7 +137,7 @@ async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_s
     payload = jwt_service.decode_jwt(credentials.credentials)
     user_id = payload.get("sub")
 
-    async with AsyncSessionLocal() as session:
+    async with (AsyncSessionLocal() as session):
         stories = await get_all_user_stories(user_id, session)
         user = await check_user(user_id, session)
 
@@ -145,11 +145,11 @@ async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_s
         delete_ids = []
 
         now = datetime.now(timezone.utc)
-        cutoff = now - timedelta(seconds=10)
+        cutoff = now - timedelta(seconds=300)
 
         for story in stories:
             print(f"{story.story_name}: {story.created_at}")
-            if story.story_name is None and story.created_at < cutoff:
+            if story.photo_status == "not_started" and story.created_at < cutoff:
                 delete_ids.append(story.id)
                 print(f"DELETED")
             else:
