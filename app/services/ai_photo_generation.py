@@ -145,7 +145,7 @@ class AIPhotoGenerator:
                     await session.commit()
                     photo_description = await self.analyze_photo(story, photo_bytes)
 
-                    if "[ERROR" in photo_description:
+                    if "[ERROR]" in photo_description:
                         story.photo_status = "error"
                         story.photo_error_message = "This is inappropriate content, please try again"
                         await session.commit()
@@ -168,7 +168,7 @@ class AIPhotoGenerator:
 
             except Exception as e:
                 story.photo_status = "error"
-                story.photo_error_message = str(e)
+                story.photo_error_message = "This is inappropriate content, please try again"
                 await session.commit()
 
 
