@@ -127,6 +127,10 @@ def determine_progress(story: StoriesModel) -> str:
         return "preview"
     elif story.story_theme and story.story_message is None:
         return "preview"
+    elif story.status == "error":
+        return "preview"
+    elif story.photo_status == "error":
+        return "first_screen"
     else:
         return "finished"
 
