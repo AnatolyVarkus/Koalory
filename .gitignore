@@ -6,3 +6,5 @@ __pycache__/
 .DS_Store
 alembic
 app.koalory_google.json
+.AppleDouble
+.LSOverride
