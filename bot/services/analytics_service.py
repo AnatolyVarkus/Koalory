@@ -27,9 +27,6 @@ async def gather_analytics(session: AsyncSession) -> str:
     avg_stories_per_user = (
         completed_stories / total_users if total_users else 0
     )
-    avg_story_length = await session.scalar(
-        select(func.avg(func.length(StoriesModel.story_text))).where(StoriesModel.status == "completed")
-    )
 
     # PAYMENTS
     total_payments = await session.scalar(select(func.count()).select_from(PaymentsModel))
@@ -55,11 +52,10 @@ async def gather_analytics(session: AsyncSession) -> str:
 📖 <b>Stories</b>
 • Completed: {completed_stories}
 • Avg. per user: {avg_stories_per_user:.2f}
-• Avg. story length: {avg_story_length or 0:.0f} chars
 
 💰 <b>Payments</b>
 • Total payments: {total_payments}
 • Unique payers: {total_paid_users}
-• Avg. per payer: {avg_payments_per_user:.2f}
+• Avg. per payer: ${avg_payments_per_user:.2f}
 • Total story credits sold: {total_payment_sum or 0}
 """.strip()
