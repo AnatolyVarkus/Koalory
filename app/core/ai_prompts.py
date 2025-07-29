@@ -52,6 +52,7 @@ Instructions:
 2. Don't mention anything if its not visible
 3. Don't use word choker 
 4. Keep [Name] and [Place of Residence] in original language
+5. If you think the content is inappropriate for Leonardo, simply return [ERROR]
 
 {f"Additional photo context: {photo_description}" if photo_description else ""}"""
 

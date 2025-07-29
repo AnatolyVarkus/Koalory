@@ -144,6 +144,13 @@ class AIPhotoGenerator:
                     story.photo_error_message = None
                     await session.commit()
                     photo_description = await self.analyze_photo(story, photo_bytes)
+
+                    if "[ERROR" in photo_description:
+                        story.photo_status = "error"
+                        story.photo_error_message = "This is inappropriate content, please try again"
+                        await session.commit()
+                        return None
+
                     await self.update_description(job_id, photo_description)
                     # prompt = await self.build_prompt(story, photo_description)
                     image_generation_id = await self.generate_avatar(photo_description)
