@@ -25,10 +25,10 @@ class PDFWithImages(FPDF):
                 img_num = int(parts[i + 1])
                 image = image_map.get(img_num)
                 if image:
-                    self.ln(5)
+                    self.ln(2)
                     page_width = self.w - 2 * self.l_margin
                     self.image(image, w=page_width)
-                    self.ln(5)
+                    self.ln(2)
             i += 2
 
 
