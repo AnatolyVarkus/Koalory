@@ -162,6 +162,7 @@ class AIPhotoGenerator:
             except Exception as e:
                 story.photo_status = "error"
                 story.photo_error_message = str(e)
+                await session.commit()
 
 
 
