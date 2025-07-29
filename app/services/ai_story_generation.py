@@ -140,7 +140,7 @@ class StoryGeneratorService:
                         tries += 1
                         if tries >= max_tries:
                             story.status = "error"
-                            story.error_message = "We couldn't generate your story, change the details"
+                            story.error_message = "We couldn't generate your story, please change the details"
                             await session.commit()
                             return None
 
@@ -164,19 +164,19 @@ class StoryGeneratorService:
                                 continue
                         else:
                             story.status = "error"
-                            story.error_message = "We couldn't generate your story, change the details"
+                            story.error_message = "We couldn't generate your story, please change the details"
                             await session.commit()
                             return None
                 else:
                     story.status = "error"
-                    story.error_message = "We couldn't generate your story, change the details"
+                    story.error_message = "We couldn't generate your story, please change the details"
                     await session.commit()
                     return None
                 try:
                     pdf_bytes = generate_pdf(result["title"], result["body"], urls)
                 except Exception:
                     story.status = "error"
-                    story.error_message = "We couldn't generate your story, change the details"
+                    story.error_message = "We couldn't generate your story, please change the details"
                     await session.commit()
                     return None
 

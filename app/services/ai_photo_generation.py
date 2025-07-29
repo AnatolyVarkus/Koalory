@@ -147,7 +147,7 @@ class AIPhotoGenerator:
 
                     if "[ERROR]" in photo_description:
                         story.photo_status = "error"
-                        story.photo_error_message = "This is inappropriate content, please try again"
+                        story.photo_error_message = photo_description.split("[ERROR]")[-1].strip()
                         await session.commit()
                         return None
 
