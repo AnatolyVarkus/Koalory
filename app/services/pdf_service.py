@@ -70,7 +70,7 @@ def generate_pdf(title: str, body: str, image_urls: list[bytes]):
     pdf.add_font("BookerlyLight", "", "./app/BookerlyLight.ttf", uni=True)
 
     # Set fonts
-    pdf.set_font("Bookerly", size=20)
+    pdf.set_font("Bookerly", size=24)
     pdf.multi_cell(0, 10, title, align="C")
     pdf.ln(10)
     pdf.set_font("BookerlyLight", size=16)
