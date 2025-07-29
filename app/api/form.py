@@ -63,16 +63,19 @@ async def get_generated_photo(
         raise HTTPException(status_code=401, detail="Invalid authentication scheme")
     payload = jwt_service.decode_jwt(credentials.credentials)
     user_id = payload.get("sub")
+
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(StoriesModel).where(and_(StoriesModel.id == job_id,
                                                                        StoriesModel.user_id == int(user_id))))
         story = result.scalar_one_or_none()
         if not story:
             raise HTTPException(status_code=404, detail=f"Story with id {job_id} not found")
-        if story.photo_url is None:
+        elif story.photo_status == "error":
+            raise HTTPException(status_code=400, detail={"target": "first_screen", "type": "error", "reason": story.photo_error_message})
+        elif story.photo_status != "finished":
             raise HTTPException(status_code=400, detail=f"The photo has not been generated yet")
-
-    return PhotoLinkResponse(photo_link = story.photo_url)
+        else:
+            return PhotoLinkResponse(photo_link = story.photo_url)
 
 @router.post("/submit_story_detail")
 async def submit_story_detail(payload: StoryDetailSubmission,

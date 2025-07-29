@@ -99,7 +99,7 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
                                            images=[story.illustration_1, story.illustration_2], pdf_url=story.story_url,
                                            email=story.user.email, word_count=len(re.findall(r'\b\w+\b', story.story_text)))
             elif story.status == "error":
-                raise HTTPException(status_code=400, detail={"type": "error", "target": "story_extra", "reason": story.error_message})
+                raise HTTPException(status_code=400, detail={"type": "error", "target": "preview", "reason": story.error_message})
             elif story.story_creation_ts:
                 progress = int(((int(time()) - story.story_creation_ts) / variables.STORY_CREATION_TIME_FRAME) * 100)
                 return StoryResponseSchema(progress=int(progress) if progress <= 90 else 90)
@@ -114,19 +114,19 @@ async def request_story(job_id: int = Query(...), credentials: HTTPAuthorization
 def determine_progress(story: StoriesModel) -> str:
 
     if story.story_creation_ts and story.status == "completed":
-        return "finished"
+        return "final"
     elif story.story_creation_ts and story.status == "started":
         return "in_progress"
     elif story.story_name is None or story.photo_url is None:
         return "first_screen"
     elif story.photo_url and story.story_extra is None:
-        return "generated_photo"
+        return "preview"
     elif story.story_extra and story.story_theme is None:
-        return "story_theme"
+        return "preview"
     elif story.story_theme and story.story_message is None:
-        return "story_message"
+        return "preview"
     else:
-        return "finished"
+        return "final"
 
 @router.get("/all_stories")
 async def all_stories(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> StoriesResponseSchema:

@@ -66,13 +66,14 @@ def generate_pdf(title: str, body: str, image_urls: list[bytes]):
         image_map[i] = bio
 
     pdf = PDFWithImages()
-    pdf.add_font("DejaVu", "", "./app/DejaVuSans.ttf", uni=True)
+    pdf.add_font("Bookerly", "", "./app/Bookerly.ttf", uni=True)
+    pdf.add_font("BookerlyLight", "", "./app/BookerlyLight.ttf", uni=True)
 
     # Set fonts
-    pdf.set_font("DejaVu", size=16)
+    pdf.set_font("Bookerly", size=20)
     pdf.multi_cell(0, 10, title, align="C")
     pdf.ln(10)
-    pdf.set_font("DejaVu", size=12)
+    pdf.set_font("BookerlyLight", size=16)
 
     # Inject text and images
     pdf.add_wrapped_text(body, image_map)

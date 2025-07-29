@@ -18,6 +18,8 @@ class StoriesModel(Base):
     story_theme: Mapped[str] = mapped_column(String(255), nullable=True)
     story_message: Mapped[str] = mapped_column(Text, nullable=True)
     story_language: Mapped[str] = mapped_column(String(255), nullable=True, default="english")
+    photo_status: Mapped[str] = mapped_column(default="not_started", nullable=True)
+    photo_error_message: Mapped[str] = mapped_column(nullable=True)
     status: Mapped[str] = mapped_column(default="not_started", nullable=True)
     error_message: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())

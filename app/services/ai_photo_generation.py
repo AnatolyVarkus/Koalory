@@ -11,6 +11,7 @@ from app.services.google_storage_service import upload_avatar
 from app.services.ai_photo_analysis import GPTVisionClient
 import asyncio
 from app.db import AsyncSessionLocal, get_story_by_job_id
+from app.db.db_celery import get_async_sessionmaker
 from sqlalchemy import select, and_
 import requests
 from uuid import uuid4
@@ -111,7 +112,8 @@ class AIPhotoGenerator:
                 return await response.read()
 
     async def update_image(self, job_id: int, image_generation_id: str):
-        async with AsyncSessionLocal() as session:
+        CeleryAsyncSessionLocal = get_async_sessionmaker()
+        async with CeleryAsyncSessionLocal() as session:
             result = await session.execute(select(StoriesModel).where(StoriesModel.id == job_id))
             story = result.scalar_one_or_none()
             if not story:
@@ -121,7 +123,8 @@ class AIPhotoGenerator:
             await session.commit()
 
     async def update_description(self, job_id: int, photo_description: str):
-        async with AsyncSessionLocal() as session:
+        CeleryAsyncSessionLocal = get_async_sessionmaker()
+        async with CeleryAsyncSessionLocal() as session:
             story = await get_story_by_job_id(job_id, session)
             story.user_description = photo_description
             await session.commit()
@@ -132,24 +135,33 @@ class AIPhotoGenerator:
         Full pipeline: analyze photo, build prompt, generate image
         Returns image URL or raises error
         """
-        try:
-            photo_description = await self.analyze_photo(story, photo_bytes)
-            await self.update_description(job_id, photo_description)
-            # prompt = await self.build_prompt(story, photo_description)
-            image_generation_id = await self.generate_avatar(photo_description)
-            tries = 0
-            while tries < 6:
-                await asyncio.sleep(2)
-                try:
-                    link = await self.run_secondary(image_generation_id, job_id)
-                    if link:
-                        break
-                except:
-                    pass
+        CeleryAsyncSessionLocal = get_async_sessionmaker()
+        async with CeleryAsyncSessionLocal() as session:
+            story = await get_story_by_job_id(job_id, session)
+            try:
+                if story.photo_status == "not_started" or story.photo_status == "error":
+                    story.photo_status = "started"
+                    story.photo_error_message = None
+                    await session.commit()
+                    photo_description = await self.analyze_photo(story, photo_bytes)
+                    await self.update_description(job_id, photo_description)
+                    # prompt = await self.build_prompt(story, photo_description)
+                    image_generation_id = await self.generate_avatar(photo_description)
+                    tries = 0
+                    while tries < 6:
+                        await asyncio.sleep(2)
+                        try:
+                            link = await self.run_secondary(image_generation_id, job_id)
+                            if link:
+                                break
+                        except:
+                            pass
 
-                tries += 1
-        except Exception as e:
-            return HTTPException(status_code=400, detail={"type": "error", "target": "first_screen", "reason": e})
+                        tries += 1
+
+            except Exception as e:
+                story.photo_status = "error"
+                story.photo_error_message = str(e)
 
 
 
@@ -160,11 +172,13 @@ class AIPhotoGenerator:
         photo_link = await self.get_image_from_leonardo(image_generation_id)
         unique_address = f"avatar_{str(uuid4())}.png"
         full_photo_link = upload_avatar(photo_link, unique_address)
-        async with AsyncSessionLocal() as session:
+        CeleryAsyncSessionLocal = get_async_sessionmaker()
+        async with CeleryAsyncSessionLocal() as session:
             result = await session.execute(select(StoriesModel).where(StoriesModel.id == job_id))
             story = result.scalar_one_or_none()
 
             story.photo_url = full_photo_link
+            story.photo_status = "finished"
             await session.commit()
         return full_photo_link
 
