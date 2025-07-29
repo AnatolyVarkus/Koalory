@@ -1,5 +1,5 @@
 from .database import AsyncSessionLocal
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, desc
 
 async def db_add(obj: object, db):
     try:
@@ -47,7 +47,7 @@ async def check_story_ownership(
 
 async def get_all_user_stories(user_id: int, session):
     from app.models import StoriesModel
-    stmt = select(StoriesModel).where(StoriesModel.user_id == int(user_id))
+    stmt = select(StoriesModel).where(StoriesModel.user_id == int(user_id)).order_by(desc(StoriesModel.created_at))
     result = await session.execute(stmt)
     stories = result.scalars().all()
     return stories
