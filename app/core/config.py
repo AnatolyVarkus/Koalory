@@ -48,7 +48,7 @@ class Variables(BaseModel):
     KOALORY_PHOTO_URL: str = "https://koalory.com/photo"
     KOALORY_STORY_URL: str = "https://koalory.com/story"
     SUBSCRIPTIONS: dict = {
-        "one": {"price": 250, "name": "First Story Package"},
+        "one": {"price": 299, "name": "First Story Package"},
         "three": {"price": 599, "name": "Three Stories Package"},
         "ten": {"price": 1499, "name": "Ten Stories Package"}
     }
