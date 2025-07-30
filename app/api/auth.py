@@ -2,7 +2,7 @@ from app.core.wrapper import CustomRoute
 from fastapi import APIRouter, HTTPException
 from app.schemas.register_schema import GoogleRequestSchema, EmailRequestSchema
 from app.services import (verify_google_token, email_authorize, jwt_service, RegisterUserService)
-from app.db import get_user_by_email, AsyncSessionLocal
+from app.db import get_user_by_email, AsyncSessionLocal, check_user
 from app.schemas.auth_schema import LoginResponse, ResetRequest, ResetVerificationRequest, SuccessfulSubmission
 from app.services.reset_token_service import generate_reset_token, verify_reset_token
 from app.services.email_sender_service import send_reset_email
@@ -41,6 +41,10 @@ async def submit_refresh_token(refresh_token: str) -> LoginResponse:
     if payload.get("type") != "refresh":
         raise HTTPException(status_code=400, detail="Invalid token type")
     user_id = payload.get("sub")
+    async with AsyncSessionLocal() as session:
+        user = await check_user(int(user_id), session)
+        if user is None:
+            raise HTTPException(status_code=400, detail="User doesn't exist")
     new_access = jwt_service.create_access_token(user_id)
     new_refresh = jwt_service.create_refresh_token(user_id)
     return LoginResponse(access_token=new_access, refresh_token=new_refresh)
