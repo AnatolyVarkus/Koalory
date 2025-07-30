@@ -56,8 +56,8 @@ async def gather_analytics(session: AsyncSession) -> str:
 • Avg. per user: {avg_stories_per_user:.2f}
 
 💰 <b>Payments</b>
-• Total payments: ${total_payments/100:.2f}
+• Total payments: ${total_payments:.2f}
 • Unique payers: {total_paid_users}
-• Avg. per payer: ${avg_payments_per_user/100:.2f}
+• Avg. per payer: ${avg_payments_per_user:.2f}
 • Total story credits sold: {total_payment_sum or 0}
 """.strip()
