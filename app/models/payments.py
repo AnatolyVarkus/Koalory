@@ -10,6 +10,7 @@ class PaymentsModel(Base):
 
     bundle_name: Mapped[str] = mapped_column(String(255))
     available_stories: Mapped[int] = mapped_column()
+    amount_in_cents: Mapped[int] = mapped_column(nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("UsersModel", back_populates="payments")
