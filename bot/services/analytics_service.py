@@ -29,7 +29,9 @@ async def gather_analytics(session: AsyncSession) -> str:
     )
 
     # PAYMENTS
-    total_payments = await session.scalar(select(func.count()).select_from(PaymentsModel.amount_in_cents))
+    total_payments = await session.scalar(
+        select(func.count(PaymentsModel.amount_in_cents))
+    )
     total_paid_users = await session.scalar(
         select(func.count(func.distinct(PaymentsModel.user_id)))
     )
