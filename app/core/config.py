@@ -11,6 +11,7 @@ def str_to_bool(value: str) -> bool:
 class Settings(BaseModel):
     DEBUG: bool = False
     LIVE_SERVER: bool = str_to_bool(os.environ.get("LIVE_SERVER"))  # Отличие тестового от live-сервера, для Stripe
+    SECRET_KEY: str = os.environ.get("SECRET_KEY")
 
     GOOGLE_CLIENT_ID: str = os.environ.get("GOOGLE_CLIENT_ID")
     BUCKET_NAME: str = "koalory_bucket"
