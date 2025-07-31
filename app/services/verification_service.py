@@ -3,7 +3,6 @@ import string
 from typing import Dict
 from datetime import datetime, timedelta, timezone
 
-# Simple in-memory store: {email: (code, expiration)}
 verification_store: Dict[str, tuple[str, datetime]] = {}
 
 def generate_verification_code(length: int = 6) -> str:

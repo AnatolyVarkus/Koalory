@@ -1,17 +1,9 @@
-import os
 import resend
 from app.core.config import settings
-import base64
-from pathlib import Path
 
-# Set Resend API key
 resend.api_key = settings.RESEND_API_KEY
 
-
 def send_email_code(to_email: str, code: str):
-    """
-    Sends a verification code to the user's email.
-    """
     print(f"[DEBUG] Verification code: {code}")
 
     params = resend.Emails.SendParams(**{
@@ -29,9 +21,6 @@ def send_email_code(to_email: str, code: str):
 
 
 def send_reset_email(to_email: str, token: str):
-    """
-    Sends a password reset email with a secure link.
-    """
     url = f"https://story.koalory.com/auth/reset?reset_token={token}"
     print(f"[DEBUG] Reset token: {token}")
     print(f"[DEBUG] Reset URL: {url}")

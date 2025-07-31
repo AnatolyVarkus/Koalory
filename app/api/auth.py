@@ -49,14 +49,6 @@ async def submit_refresh_token(refresh_token: str) -> LoginResponse:
     new_refresh = jwt_service.create_refresh_token(user_id)
     return LoginResponse(access_token=new_access, refresh_token=new_refresh)
 
-# @router.post("/test_auth")
-# async def test_auth() -> LoginResponse:
-#     user_id = 123  # Dummy user ID for testing
-#     access_token = jwt_service.create_access_token(user_id)
-#     refresh_token = jwt_service.create_refresh_token(user_id)
-#     return LoginResponse(access_token=access_token, refresh_token=refresh_token)
-
-
 @router.post("/reset")
 async def request_password_reset(payload: ResetRequest) -> SuccessfulSubmission:
     async with AsyncSessionLocal() as session:

@@ -18,7 +18,5 @@ async def google_register_request(payload: GoogleRequestSchema):
 @router.post("/email_register")
 async def email_register_request(payload: EmailRequestSchema):
     service = RegisterUserService("email", str(payload.email), payload.password)
-    user_id = await service.register()
-    access_token = jwt_service.create_access_token(user_id)
-    refresh_token = jwt_service.create_refresh_token(user_id)
+    await service.register()
     return LoginResponse(access_token="", refresh_token="")

@@ -1,10 +1,9 @@
 import stripe
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core import settings, variables
 from app.db import AsyncSessionLocal, db_add, get_all_user_stories
 from app.models import PaymentsModel
 from sqlalchemy import select, func
+
 stripe.api_key = settings.STRIPE_API_KEY
 
 def create_stripe_payment_link(user_id: int, job_id: int | None, option: str) -> str:

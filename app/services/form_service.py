@@ -1,28 +1,16 @@
 from app.models import StoriesModel, UsersModel
 from app.db import AsyncSessionLocal, db_add, check_user
 from app.core import variables
-from app.services.ai_photo_generation import AIPhotoGenerator
-from app.services.ai_story_generation import StoryGeneratorService
 from sqlalchemy import select, and_, func
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException
 from typing import Union
-from time import time
 
 class FormHandlerService:
     @staticmethod
     async def handler_create_story(user_id: int):
         async with AsyncSessionLocal() as session:
-            print(f"User_id: {user_id}")
             user: UsersModel = await check_user(user_id, session)
-            story_count = await session.scalar(select(func.count()).where(StoriesModel.user_id == user.id))
             if user:
-                # if (
-                #         user.subscription == "free" and story_count >= 1 or
-                #         user.subscription == "one" and story_count >= 1 or
-                #         user.subscription == "three" and story_count >= 3 or
-                #         user.subscription == "ten" and story_count >= 10
-                # ):
-                #     raise HTTPException(status_code=400, detail=f"Limit exceeded: {story_count}")
                 new_story = StoriesModel(user_id=user_id)
                 await db_add(new_story, session)
                 return new_story.id
@@ -44,7 +32,7 @@ class FormHandlerService:
                 await session.refresh(story)
                 if photo:
                     from app.tasks.photo_task import run_photo_generation
-                    run_photo_generation.delay(photo, job_id, user_id)
+                    run_photo_generation.delay(photo, job_id)
                 return story.id
             else:
                 raise HTTPException(status_code=404, detail="Story not found")
@@ -56,13 +44,8 @@ class FormHandlerService:
                 story: StoriesModel = result.scalar_one_or_none()
                 if story:
                     self.update_field(story, field_name, value)
-                    # if field_name == "story_message":
-                    #     story.story_creation_ts = int(time())
                     await session.commit()
                     await session.refresh(story)
-                    # if field_name == "story_message":
-                    #     from app.tasks.story_task import run_story_generation
-                    #     run_story_generation.delay(user_id, job_id)
                     return story.id
                 else:
                     raise HTTPException(status_code=404, detail="Story not found")

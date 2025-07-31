@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from app.schemas.verification_schema import EmailRequest, EmailVerificationRequest, TokenResponse, SuccessfulSubmission
 from app.services import jwt_service
 from app.services.verification_service import generate_verification_code, save_verification_code, verify_code
-from app.services.email_sender_service import send_email_code  # You must implement this
+from app.services.email_sender_service import send_email_code
 from app.db import AsyncSessionLocal
 from app.models import UsersModel
 from app.db import get_user_by_email

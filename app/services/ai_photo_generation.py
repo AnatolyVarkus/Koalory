@@ -1,45 +1,31 @@
 import aiohttp
 from typing import Optional
-
 from fastapi import HTTPException
-
 from app.core.ai_prompts import ai_prompts
 from app.models.stories import StoriesModel
 from app.core import settings
-import asyncio
 from app.services.google_storage_service import upload_avatar
 from app.services.ai_photo_analysis import GPTVisionClient
 import asyncio
-from app.db import AsyncSessionLocal, get_story_by_job_id
+from app.db import get_story_by_job_id
 from app.db.db_celery import get_async_sessionmaker
-from sqlalchemy import select, and_
-import requests
+from sqlalchemy import select
 from uuid import uuid4
 
 class AIPhotoGenerator:
-    """
-    Handles AI photo generation process:
-    1. Analyzes photo with GPT-4V
-    2. Builds Leonardo prompt from user info + analysis
-    3. Sends request to Leonardo API to generate image
-    """
-
     def __init__(self):
         self.gpt_vision_client = GPTVisionClient()
         self.leonardo_api_key = settings.LEONARDO_API_KEY
 
     async def analyze_photo(self, story: StoriesModel, photo_bytes: bytes) -> str:
-        """Analyze photo with GPT-4V for physical appearance details"""
         prompt = ai_prompts.get_hero_avatar_prompt(story)
         return await self.gpt_vision_client.analyze_image(photo_bytes, prompt)
 
     async def build_prompt(self, story: StoriesModel, photo_description: str) -> str:
-        """Build Leonardo prompt from story + photo analysis"""
         leonardo_prompt = await self.gpt_vision_client.generate_leonardo_prompt(ai_prompts.get_hero_avatar_prompt(story, photo_description))
         return leonardo_prompt
 
     async def generate_avatar(self, prompt: str) -> Optional[str]:
-        """Call Leonardo API to generate image"""
         url = f"https://cloud.leonardo.ai/api/rest/v1/generations"
 
         headers = {
@@ -51,7 +37,7 @@ class AIPhotoGenerator:
             "prompt": prompt,
             "width": 1200,
             "height": 720,
-            "modelId": settings.LEONARDO_MODEL_ID, # Replace with actual model ID
+            "modelId": settings.LEONARDO_MODEL_ID,
             "num_images": 1
         }
 
@@ -66,7 +52,7 @@ class AIPhotoGenerator:
                 data = await response.json()
                 try:
                     print(data)
-                    return data['sdGenerationJob']["generationId"]  # Adjust according to Leonardo’s response format
+                    return data['sdGenerationJob']["generationId"]
                 except (KeyError, IndexError) as e:
                     raise HTTPException(status_code=400, detail=f"Leonardo response malformed: {e}")
 
@@ -90,7 +76,6 @@ class AIPhotoGenerator:
                 except (KeyError, IndexError):
                     raise HTTPException(status_code=400, detail="Leonardo response malformed")
 
-        # Now test the URL with retries
         for attempt in range(5):
             try:
                 async with aiohttp.ClientSession() as session:
@@ -104,7 +89,6 @@ class AIPhotoGenerator:
         raise HTTPException(status_code=500, detail="Leonardo CDN returned invalid image repeatedly.")
 
     async def download_image(self, url: str) -> bytes:
-        """Download image from a URL and return its bytes"""
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status != 200:
@@ -130,11 +114,7 @@ class AIPhotoGenerator:
             await session.commit()
 
 
-    async def run(self, photo_bytes: bytes, job_id: int, user_id: int):
-        """
-        Full pipeline: analyze photo, build prompt, generate image
-        Returns image URL or raises error
-        """
+    async def run(self, photo_bytes: bytes, job_id: int):
         CeleryAsyncSessionLocal = get_async_sessionmaker()
         async with CeleryAsyncSessionLocal() as session:
             story = await get_story_by_job_id(job_id, session)
@@ -152,7 +132,6 @@ class AIPhotoGenerator:
                         return None
 
                     await self.update_description(job_id, photo_description)
-                    # prompt = await self.build_prompt(story, photo_description)
                     image_generation_id = await self.generate_avatar(photo_description)
                     tries = 0
                     while tries < 6:
@@ -186,14 +165,13 @@ class AIPhotoGenerator:
             story = result.scalar_one_or_none()
 
             story.photo_url = full_photo_link
-            story.photo_status = "finished"
+            story.photo_status = "completed"
             await session.commit()
         return full_photo_link
 
 
 
     async def generate_6_illustrations(self, prompts, character_description):
-        print(f"PROMPTS = {prompts}")
         generated_images = []
         for prompt in prompts:
             image = await self.generate_avatar(prompt+f"\n Extra character description: \n {character_description}")
@@ -214,7 +192,3 @@ async def fetch_image_bytes(url: str) -> bytes:
             if response.status != 200:
                 raise Exception(f"Failed to fetch image: {response.status}")
             return await response.read()
-
-# Usage example (you must wire `gpt_vision_client` separately):
-# ai_generator = AIPhotoGenerator(gpt_vision_client, settings.LEONARDO_API_KEY)
-# image_url = await ai_generator.run(story_model, uploaded_photo.read())

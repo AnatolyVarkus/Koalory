@@ -1,6 +1,5 @@
 from celery import Celery
-from app.core import settings  # assuming you have Redis/host info in your settings
-from app.tasks import story_task, photo_task  # force-load the module
+from app.core import settings
 
 celery = Celery(
     'worker',
@@ -8,4 +7,4 @@ celery = Celery(
     backend=settings.CELERY_RESULT_BACKEND,
 )
 
-celery.autodiscover_tasks(['app.tasks'])  # Make sure your tasks package is here
+celery.autodiscover_tasks(['app.tasks'])

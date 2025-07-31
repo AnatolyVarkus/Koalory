@@ -1,9 +1,6 @@
-import aiohttp
 from typing import Optional
-
 from fastapi import HTTPException
 import re
-from app.core.ai_prompts import ai_prompts
 from app.models import UsersModel
 from app.models.stories import StoriesModel
 from app.models import PaymentsModel
@@ -11,18 +8,14 @@ from typing import Dict, List
 from app.core import settings
 from app.services.email_sender_service import send_pdf_email
 from app.core.ai_prompts import ai_prompts
-from app.services.stripe_service import count_available_stories
 from app.services.ai_photo_generation import AIPhotoGenerator
 from app.services.google_storage_service import upload_pdf, upload_image
-from app.services.ai_photo_analysis import GPTVisionClient
-from app.db import AsyncSessionLocal
-from sqlalchemy import select, and_, func
+from sqlalchemy import select, func
 from app.db import get_story_by_job_id, check_user, get_all_user_stories
-from anthropic import AsyncAnthropic, HUMAN_PROMPT, AI_PROMPT
-from anthropic.types import MessageParam, ContentBlockParam, TextBlockParam
-from app.services.pdf_service import generate_pdf, test_text
+from anthropic import AsyncAnthropic
+from anthropic.types import MessageParam, TextBlockParam
+from app.services.pdf_service import generate_pdf
 from uuid import uuid4
-import asyncio
 from time import time
 from app.db.db_celery import get_async_sessionmaker
 
@@ -39,7 +32,6 @@ class StoryGeneratorService:
         CeleryAsyncSessionLocal = get_async_sessionmaker()
         async with CeleryAsyncSessionLocal() as session:
             story = await get_story_by_job_id(self.job_id, session)
-            user = await check_user(self.user_id, session)
             return ai_prompts.get_story_generation_prompt(story, story.user_description)
 
     async def query_claude(self, prompt: str):
@@ -57,7 +49,7 @@ class StoryGeneratorService:
                 ]
             )
             print(f"response.content[0].text: {response.content[0].text}")
-            return response.content[0].text  # Assuming you want just the text content
+            return response.content[0].text
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Claude API error: {str(e)}")
 
@@ -70,21 +62,17 @@ class StoryGeneratorService:
             "illustration_prompts": []
         }
 
-        # 1. Вырезаем title
         title_match = re.search(r"\[TITL\]\s*(.*?)\n", text)
         if title_match:
             result["title"] = title_match.group(1).strip()
 
-        # 2. Extract [STRY] ... until [ILLUS]
         body_match = re.search(r"\[STRY\]\s*(.*?)\[ILLUS\]", text, re.DOTALL)
         if body_match:
             result["body"] = body_match.group(1).strip()
 
-        # 3. Extract prompts n1: ... n6:
         prompts = re.findall(r"\[N\d\]\s*(.*?)(?=\n\[N\d\]|\Z)", text, re.DOTALL)
         result["illustration_prompts"] = [p.strip() for p in prompts]
 
-        print(f"result: {result}")
         return result
 
     async def update_story(self, title, body, pdf_url, unique):
@@ -130,7 +118,6 @@ class StoryGeneratorService:
                 tries = 0
                 max_tries = 4
 
-                # Step 1: Get Claude response and parse
                 for _ in range(max_tries):
                     try:
                         claude_response = await self.query_claude(prompt)
@@ -144,7 +131,6 @@ class StoryGeneratorService:
                             await session.commit()
                             return None
 
-                # Step 2: Try generating images
                 for _ in range(max_tries):
                     try:
                         photo_generator = AIPhotoGenerator()
@@ -154,7 +140,6 @@ class StoryGeneratorService:
                             upload_image(url, f"photo_{i}_{unique_story_uuid}.png")
                         break
                     except Exception:
-                        # Retry Claude again in case Leonardo breaks on formatting
                         for _ in range(max_tries):
                             try:
                                 claude_response = await self.query_claude(prompt)

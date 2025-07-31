@@ -1,5 +1,4 @@
 from app.db import AsyncSessionLocal
-from app.models import UsersModel
 from fastapi import HTTPException
 from passlib.context import CryptContext
 from app.core.config import settings

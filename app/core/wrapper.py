@@ -13,13 +13,11 @@ class CustomRoute(APIRoute):
 
         async def custom_route_handler(request: Request):
             try:
-                # Execute the original handler
                 response = await original_route_handler(request)
 
                 if inspect.isawaitable(response):
                     response = await response
 
-                # Extract body safely
                 body = getattr(response, "body", None)
                 if body is None:
                     decoded_body = None

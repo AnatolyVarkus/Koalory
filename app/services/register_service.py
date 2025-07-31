@@ -2,7 +2,6 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from app.models import UsersModel
 from app.db import db_add, get_user_by_email, AsyncSessionLocal
-from sqlalchemy import delete
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

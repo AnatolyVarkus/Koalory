@@ -1,24 +1,16 @@
 from fastapi import APIRouter, Depends, Form, File, UploadFile, HTTPException
-from fastapi.responses import Response
 from app.core.wrapper import CustomRoute
 from app.schemas.form_schema import (StoryDetailSubmission, SuccessfulSubmission, PhotoLinkResponse)
-from app.services import jwt_service, form_handler_service, AIPhotoGenerator
-from app.services.google_storage_service import get_blob_link
+from app.services import jwt_service, form_handler_service
 from app.db import AsyncSessionLocal
 from sqlalchemy import select, and_
-from fastapi.security import OAuth2PasswordBearer
 from app.models import StoriesModel
 from PIL import Image
 from io import BytesIO
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 auth_scheme = HTTPBearer()
-
 router = APIRouter(prefix="/form", route_class=CustomRoute)
-
-import re
-
-
 
 @router.post("/create_story")
 async def create_story(credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)) -> SuccessfulSubmission:
@@ -40,18 +32,14 @@ async def submit_first_screen(
     photo: UploadFile = File(...),
     credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)
 ) -> SuccessfulSubmission:
-    try:
-        if credentials.scheme.lower() != "bearer":
-            raise HTTPException(status_code=401, detail="Invalid authentication scheme")
-        payload = jwt_service.decode_jwt(credentials.credentials)
-        user_id = payload.get("sub")
+    if credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Invalid authentication scheme")
+    payload = jwt_service.decode_jwt(credentials.credentials)
+    user_id = payload.get("sub")
 
-        job_id = await form_handler_service.handler_update_first_screen(int(user_id), job_id, name, gender, age, location, await normalize_image(photo))
-        return SuccessfulSubmission(job_id=job_id)
-    except Exception as e:
-        import traceback
-        print("Exception:", e)
-        traceback.print_exc()
+    job_id = await form_handler_service.handler_update_first_screen(int(user_id), job_id, name, gender, age, location,
+                                                                    await normalize_image(photo))
+    return SuccessfulSubmission(job_id=job_id)
 
 async def normalize_image(photo: UploadFile) -> bytes:
     image = Image.open(BytesIO(await photo.read()))
@@ -77,7 +65,7 @@ async def get_generated_photo(
             raise HTTPException(status_code=404, detail=f"Story with id {job_id} not found")
         elif story.photo_status == "error":
             raise HTTPException(status_code=400, detail={"target": "first_screen", "type": "error", "reason": story.photo_error_message})
-        elif story.photo_status != "finished":
+        elif story.photo_status != "completed":
             raise HTTPException(status_code=400, detail=f"The photo has not been generated yet")
         else:
             return PhotoLinkResponse(photo_link = story.photo_url)

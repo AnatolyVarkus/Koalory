@@ -1,24 +1,15 @@
-from fastapi import APIRouter, Depends, Form, File, Request, HTTPException
-from fastapi.responses import Response
+from fastapi import APIRouter, Depends, Request, HTTPException
 from app.core.wrapper import CustomRoute
 from app.schemas.payment_schema import (PaymentResponse, PaymentRequest)
-from app.services import jwt_service, form_handler_service, submit_stripe_payment
-from app.db import AsyncSessionLocal
-from sqlalchemy import select, and_
+from app.services import jwt_service, submit_stripe_payment
 from fastapi import Header
 from app.core import settings
 import stripe
-
-from fastapi.security import OAuth2PasswordBearer
-from app.models import StoriesModel
-from PIL import Image
-from io import BytesIO
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.services import create_stripe_payment_link
 
 auth_scheme = HTTPBearer()
 router = APIRouter(prefix="/payment", route_class=CustomRoute)
-
 
 @router.post("/generate_payment_link")
 async def generate_payment_link(payload: PaymentRequest,
