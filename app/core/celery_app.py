@@ -1,5 +1,6 @@
 from celery import Celery
 from app.core import settings
+from app.tasks import story_task, photo_task
 
 celery = Celery(
     'worker',
